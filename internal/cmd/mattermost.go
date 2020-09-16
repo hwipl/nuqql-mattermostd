@@ -12,6 +12,7 @@ type mattermost struct {
 	username string
 	password string
 	client   *model.Client4
+	user     *model.User
 }
 
 // getErrorMessage converts an AppError to a string
@@ -31,19 +32,19 @@ func (m *mattermost) connect() {
 	log.Println("Server is running version", props["Version"])
 
 	// login
-	user, resp := m.client.Login(m.username, m.password)
+	m.user, resp = m.client.Login(m.username, m.password)
 	if resp.Error != nil {
 		log.Fatal(getErrorMessage(resp.Error))
 	}
-	log.Println("Logged in as user", user.Username)
+	log.Println("Logged in as user", m.user.Username)
 
 	// get teams
-	teams, resp := m.client.GetTeamsForUser(user.Id, "")
+	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
 	if resp.Error != nil {
 		log.Fatal(getErrorMessage(resp.Error))
 	}
 	for _, t := range teams {
-		log.Println("User", user.Username, "is a member of team",
+		log.Println("User", m.user.Username, "is a member of team",
 			t.Name, "("+t.DisplayName+")")
 	}
 }
