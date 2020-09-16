@@ -22,7 +22,7 @@ func getErrorMessage(err *model.AppError) string {
 
 // connect connects to a mattermost server
 func (m *mattermost) connect() {
-	m.client = model.NewAPIv4Client(m.server)
+	m.client = model.NewAPIv4Client("http://" + m.server)
 
 	// check is server is running
 	props, resp := m.client.GetOldClientConfig("")
@@ -65,7 +65,7 @@ func (m *mattermost) connect() {
 func runClient() {
 	// TODO: fix server address, add username and password
 	m := mattermost{
-		server:   "http://localhost:8065",
+		server:   "localhost:8065",
 		username: "",
 		password: "",
 	}
