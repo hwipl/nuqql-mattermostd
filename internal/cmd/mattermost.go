@@ -46,6 +46,18 @@ func (m *mattermost) connect() {
 	for _, t := range teams {
 		log.Println("User", m.user.Username, "is a member of team",
 			t.Name, "("+t.DisplayName+")")
+
+		// get channels
+		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
+			m.user.Id, false, "")
+		if resp.Error != nil {
+			log.Fatal(getErrorMessage(resp.Error))
+		}
+		for _, c := range channels {
+			log.Println("User", m.user.Username, "is in team",
+				t.Name+"'s channel", c.Name,
+				"("+c.DisplayName+")")
+		}
 	}
 }
 
