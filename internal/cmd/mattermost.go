@@ -36,6 +36,16 @@ func (m *mattermost) connect() {
 		log.Fatal(getErrorMessage(resp.Error))
 	}
 	log.Println("Logged in as user", user.Username)
+
+	// get teams
+	teams, resp := m.client.GetTeamsForUser(user.Id, "")
+	if resp.Error != nil {
+		log.Fatal(getErrorMessage(resp.Error))
+	}
+	for _, t := range teams {
+		log.Println("User", user.Username, "is a member of team",
+			t.Name, "("+t.DisplayName+")")
+	}
 }
 
 // runClient runs a mattermost client
