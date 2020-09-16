@@ -21,6 +21,11 @@ func getErrorMessage(err *model.AppError) string {
 	return err.Message + " " + err.Id + " " + err.DetailedError
 }
 
+// handleWebSocketEvent handles events from the websocket
+func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
+	log.Println("WebSocket Event:", event.EventType())
+}
+
 // connect connects to a mattermost server
 func (m *mattermost) connect() {
 	m.client = model.NewAPIv4Client("http://" + m.server)
@@ -67,8 +72,17 @@ func (m *mattermost) connect() {
 	if err != nil {
 		log.Fatal(getErrorMessage(err))
 	}
+	defer websock.Close()
 	m.websock = websock
 	m.websock.Listen()
+
+	// handle websocket events
+	for {
+		select {
+		case event := <-m.websock.EventChannel:
+			m.handleWebSocketEvent(event)
+		}
+	}
 }
 
 // runClient runs a mattermost client
