@@ -13,6 +13,7 @@ type mattermost struct {
 	password string
 	client   *model.Client4
 	user     *model.User
+	websock  *model.WebSocketClient
 }
 
 // getErrorMessage converts an AppError to a string
@@ -59,6 +60,15 @@ func (m *mattermost) connect() {
 				"("+c.DisplayName+")")
 		}
 	}
+
+	// create websocket and start listening for events
+	websock, err := model.NewWebSocketClient4("ws://"+m.server,
+		m.client.AuthToken)
+	if err != nil {
+		log.Fatal(getErrorMessage(err))
+	}
+	m.websock = websock
+	m.websock.Listen()
 }
 
 // runClient runs a mattermost client
