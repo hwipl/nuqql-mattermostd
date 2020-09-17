@@ -86,12 +86,11 @@ func (m *mattermost) connect() {
 }
 
 // runClient runs a mattermost client
-func runClient() {
-	// TODO: fix server address, add username and password
+func runClient(server, username, password string) {
 	m := mattermost{
-		server:   "localhost:8065",
-		username: "",
-		password: "",
+		server:   server,
+		username: username,
+		password: password,
 	}
 	m.connect()
 }
