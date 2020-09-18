@@ -4,6 +4,9 @@ import "strings"
 
 // Run is the main entry point
 func Run() {
+	// start server
+	go runServer()
+
 	// read accounts
 	readAccountsFromFile("accounts.json")
 	for _, a := range accounts {
