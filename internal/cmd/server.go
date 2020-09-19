@@ -14,6 +14,11 @@ type server struct {
 	conn     net.Conn
 }
 
+// handleCommand handles a command receviced from the client
+func (s *server) handleCommand(cmd string) {
+	log.Println("client:", cmd)
+}
+
 // handleClient handles a single client connection
 func (s *server) handleClient() {
 	defer s.conn.Close()
@@ -32,7 +37,7 @@ func (s *server) handleClient() {
 		// read and concatenate cmd lines until "\r\n"
 		c += cmd
 		if len(c) > 2 && c[len(c)-2] == '\r' {
-			log.Println("client:", c)
+			s.handleCommand(c)
 			c = ""
 		}
 	}
