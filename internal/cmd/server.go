@@ -20,13 +20,21 @@ func (s *server) handleClient() {
 	log.Println("New client connection", s.conn.RemoteAddr())
 
 	r := bufio.NewReader(s.conn)
+	c := ""
 	for {
+		// read a cmd line from the client
 		cmd, err := r.ReadString('\n')
 		if err != nil {
 			log.Println("client:", err)
 			return
 		}
-		log.Println("client:", cmd)
+
+		// read and concatenate cmd lines until "\r\n"
+		c += cmd
+		if len(c) > 2 && c[len(c)-2] == '\r' {
+			log.Println("client:", c)
+			c = ""
+		}
 	}
 }
 
