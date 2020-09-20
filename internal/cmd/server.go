@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 )
 
@@ -64,12 +65,60 @@ type server struct {
 	clientActive bool
 }
 
-// handleCommand handles a command receviced from the client
+// handleAccountCommand handles an account command received from the client
+func (s *server) handleAccountCommand(parts []string) {
+	// account commands consist of at least 2 parts
+	if len(parts) < 2 {
+		return
+	}
+
+	// commands "list" and "add" are the only ones that do not start with
+	// an account id; handle them first
+	if parts[1] == "list" {
+		log.Println("list NYI")
+		return
+	}
+	if parts[1] == "add" {
+		log.Println("add NYI")
+		return
+	}
+
+	// other commands contain at least 3 parts
+	if len(parts) < 3 {
+		return
+	}
+
+	// other commands contain an account id; try to parse it
+	id, err := strconv.ParseUint(parts[1], 10, 16)
+	if err != nil {
+		return
+	}
+
+	// handle other commands
+	switch parts[2] {
+	case "delete":
+		log.Println("delete", id, "NYI")
+	case "buddies":
+		log.Println("buddies", id, "NYI")
+	case "collect":
+		log.Println("collect", id, "NYI")
+	case "send":
+		log.Println("send", id, "NYI")
+	case "status":
+		log.Println("status", id, "NYI")
+	case "chat":
+		log.Println("chat", id, "NYI")
+	}
+}
+
+// handleCommand handles a command received from the client
 func (s *server) handleCommand(cmd string) {
 	log.Println("client:", cmd)
 
 	parts := strings.Split(cmd, " ")
 	switch parts[0] {
+	case "account":
+		s.handleAccountCommand(parts)
 	case "bye":
 		s.clientActive = false
 	case "quit":
