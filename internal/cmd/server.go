@@ -37,7 +37,7 @@ func (s *server) handleClient() {
 		// read and concatenate cmd lines until "\r\n"
 		c += cmd
 		if len(c) > 2 && c[len(c)-2] == '\r' {
-			s.handleCommand(c)
+			s.handleCommand(c[:len(c)-2])
 			c = ""
 		}
 	}
