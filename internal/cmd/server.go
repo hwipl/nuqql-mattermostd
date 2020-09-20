@@ -14,7 +14,8 @@ type server struct {
 	listener net.Listener
 	conn     net.Conn
 
-	// is client active?
+	// is server/client active?
+	serverActive bool
 	clientActive bool
 }
 
@@ -26,6 +27,9 @@ func (s *server) handleCommand(cmd string) {
 	switch parts[0] {
 	case "bye":
 		s.clientActive = false
+	case "quit":
+		s.clientActive = false
+		s.serverActive = false
 	}
 }
 
@@ -63,10 +67,11 @@ func (s *server) run() {
 	}
 	defer l.Close()
 	s.listener = l
+	s.serverActive = true
 
 	// handle client connections
 	log.Println("Server waiting for client connection")
-	for {
+	for s.serverActive {
 		conn, err := s.listener.Accept()
 		if err != nil {
 			log.Println(err)
