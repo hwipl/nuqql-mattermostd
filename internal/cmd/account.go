@@ -45,6 +45,16 @@ func getAccounts() []*account {
 	return accs
 }
 
+// getFreeAccountID returns the first free account ID
+func getFreeAccountID() int {
+	for i := 0; i < len(accounts); i++ {
+		if accounts[i] == nil {
+			return i
+		}
+	}
+	return len(accounts)
+}
+
 // readAccountsFromFile reads accounts from file
 func readAccountsFromFile(file string) {
 	// open file for reading
