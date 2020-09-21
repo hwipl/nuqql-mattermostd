@@ -92,6 +92,24 @@ func (s *server) handleAccountList() {
 	}
 }
 
+// handleAccountAdd handles an account add command
+func (s *server) handleAccountAdd(parts []string) {
+	// expected command format:
+	// account add <protocol> <user> <password>
+	if len(parts) < 5 {
+		return
+	}
+	protocol := parts[2]
+	user := parts[3]
+	password := parts[4]
+	id := addAccount(protocol, user, password)
+	log.Println("added new account with id:", id)
+
+	// optional reply:
+	// info: new account added.
+	s.sendClient("info: new account added.\r\n")
+}
+
 // handleAccountCommand handles an account command received from the client
 func (s *server) handleAccountCommand(parts []string) {
 	// account commands consist of at least 2 parts
@@ -106,7 +124,7 @@ func (s *server) handleAccountCommand(parts []string) {
 		return
 	}
 	if parts[1] == "add" {
-		log.Println("add NYI")
+		s.handleAccountAdd(parts)
 		return
 	}
 
