@@ -65,6 +65,20 @@ type server struct {
 	clientActive bool
 }
 
+// sendClient sends msg to the client
+func (s *server) sendClient(msg string) {
+	w := bufio.NewWriter(s.conn)
+	n, err := w.WriteString(msg)
+	if n < len(msg) || err != nil {
+		s.clientActive = false
+		log.Println("send:", len(msg), n, err)
+	}
+	if err := w.Flush(); err != nil {
+		s.clientActive = false
+		log.Println("send flush:", err)
+	}
+}
+
 // handleAccountCommand handles an account command received from the client
 func (s *server) handleAccountCommand(parts []string) {
 	// account commands consist of at least 2 parts
@@ -125,16 +139,7 @@ func (s *server) handleCommand(cmd string) {
 		s.clientActive = false
 		s.serverActive = false
 	case "help":
-		w := bufio.NewWriter(s.conn)
-		n, err := w.WriteString(helpMessage)
-		if n < len(helpMessage) || err != nil {
-			s.clientActive = false
-			log.Println(err)
-		}
-		if err := w.Flush(); err != nil {
-			s.clientActive = false
-			log.Println(err)
-		}
+		s.sendClient(helpMessage)
 	}
 }
 
