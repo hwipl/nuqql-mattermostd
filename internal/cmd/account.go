@@ -20,6 +20,11 @@ type account struct {
 	Password string
 }
 
+// getAccount returns account with account ID
+func getAccount(id int) *account {
+	return accounts[id]
+}
+
 // readAccountsFromFile reads accounts from file
 func readAccountsFromFile(file string) {
 	// open file for reading
