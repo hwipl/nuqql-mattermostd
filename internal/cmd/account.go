@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sort"
 )
 
 var (
@@ -23,6 +24,25 @@ type account struct {
 // getAccount returns account with account ID
 func getAccount(id int) *account {
 	return accounts[id]
+}
+
+// getAccounts returns all accounts sorted by account ID
+func getAccounts() []*account {
+	// sort account ids
+	ids := make([]int, len(accounts))
+	i := 0
+	for id := range accounts {
+		ids[i] = id
+		i++
+	}
+	sort.Ints(ids)
+
+	// construct sorted slice of accounts
+	accs := make([]*account, len(accounts))
+	for i, id := range ids {
+		accs[i] = accounts[id]
+	}
+	return accs
 }
 
 // readAccountsFromFile reads accounts from file

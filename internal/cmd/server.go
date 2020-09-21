@@ -82,7 +82,7 @@ func (s *server) sendClient(msg string) {
 
 // handleAccountList handles an account list command
 func (s *server) handleAccountList() {
-	for _, a := range accounts {
+	for _, a := range getAccounts() {
 		// send replies with the following format:
 		// account: <id> <name> <protocol> <user> <status>
 		r := fmt.Sprintf("account: %d %s %s %s %s\r\n", a.ID, "()",
