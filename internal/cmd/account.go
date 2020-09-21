@@ -55,6 +55,19 @@ func getFreeAccountID() int {
 	return len(accounts)
 }
 
+// addAccount adds a new account with protocol, user and password and returns
+// the new account's ID
+func addAccount(protocol, user, password string) int {
+	a := account{
+		ID:       getFreeAccountID(),
+		Protocol: protocol,
+		User:     user,
+		Password: password,
+	}
+	accounts[a.ID] = &a
+	return a.ID
+}
+
 // readAccountsFromFile reads accounts from file
 func readAccountsFromFile(file string) {
 	// open file for reading
