@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"net"
 	"strconv"
@@ -79,6 +80,18 @@ func (s *server) sendClient(msg string) {
 	}
 }
 
+// handleAccountList handles an account list command
+func (s *server) handleAccountList() {
+	for _, a := range accounts {
+		// send replies with the following format:
+		// account: <id> <name> <protocol> <user> <status>
+		r := fmt.Sprintf("account: %d %s %s %s %s\r\n", a.ID, "()",
+			a.Protocol, a.User, "online")
+		log.Println(r)
+		s.sendClient(r)
+	}
+}
+
 // handleAccountCommand handles an account command received from the client
 func (s *server) handleAccountCommand(parts []string) {
 	// account commands consist of at least 2 parts
@@ -89,7 +102,7 @@ func (s *server) handleAccountCommand(parts []string) {
 	// commands "list" and "add" are the only ones that do not start with
 	// an account id; handle them first
 	if parts[1] == "list" {
-		log.Println("list NYI")
+		s.handleAccountList()
 		return
 	}
 	if parts[1] == "add" {
