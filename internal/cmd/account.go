@@ -10,6 +10,9 @@ import (
 )
 
 var (
+	// accountsFile is the json file that contains all accounts
+	accountsFile = "accounts.json"
+
 	// accounts contains all active accounts
 	accounts = make(map[int]*account)
 )
@@ -123,7 +126,7 @@ func writeAccountsToFile(file string) {
 
 func initAccounts() {
 	// read accounts
-	readAccountsFromFile("accounts.json")
+	readAccountsFromFile(accountsFile)
 	for _, a := range accounts {
 		// skip non-mattermost accounts
 		if a.Protocol != "mattermost" {
