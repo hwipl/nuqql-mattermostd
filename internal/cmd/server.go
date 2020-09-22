@@ -141,6 +141,16 @@ func (s *server) handleAccountSend(a *account, parts []string) {
 	a.client.sendMsg(channel, msg)
 }
 
+// handleAccountChatList handles an account chat list command
+func (s *server) handleAccountChatList(a *account) {
+	for _, b := range a.client.getBuddies() {
+		// chat: list: <acc_id> <chat_id> <chat_alias> <nick>
+		m := fmt.Sprintf("chat: list: %d %s %s %s\r\n",
+			a.ID, b.user, b.name, a.client.username)
+		s.sendClient(m)
+	}
+}
+
 // handleAccountChatSend handles an account chat send command
 func (s *server) handleAccountChatSend(a *account, parts []string) {
 	// account <id> chat send <chat> <msg>
@@ -163,7 +173,7 @@ func (s *server) handleAccountChat(a *account, parts []string) {
 	// handle chat subcommands
 	switch parts[3] {
 	case "list":
-		log.Println("chat list NYI")
+		s.handleAccountChatList(a)
 	case "join":
 		log.Println("chat join NYI")
 	case "part":
