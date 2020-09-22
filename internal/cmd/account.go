@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strings"
 )
 
 var (
@@ -117,5 +118,23 @@ func writeAccountsToFile(file string) {
 		if err != nil {
 			log.Fatal(err)
 		}
+	}
+}
+
+func initAccounts() {
+	// read accounts
+	readAccountsFromFile("accounts.json")
+	for _, a := range accounts {
+		// skip non-mattermost accounts
+		if a.Protocol != "mattermost" {
+			continue
+		}
+
+		// extract server and username from account user
+		user := strings.Split(a.User, "@")[0]
+		server := strings.Split(a.User, "@")[1]
+
+		// start client
+		go runClient(server, user, a.Password)
 	}
 }
