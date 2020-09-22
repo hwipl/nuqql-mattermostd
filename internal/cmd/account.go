@@ -126,7 +126,8 @@ func writeAccountsToFile(file string) {
 	}
 }
 
-func initAccounts() {
+// startAccounts initializes all accounts and starts their clients
+func startAccounts() {
 	// read accounts
 	readAccountsFromFile(accountsFile)
 	for _, a := range accounts {
