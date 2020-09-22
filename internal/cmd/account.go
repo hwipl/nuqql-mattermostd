@@ -102,6 +102,7 @@ func addAccount(protocol, user, password string) int {
 // delAccount removes the existing account with id
 func delAccount(id int) bool {
 	if accounts[id] != nil {
+		accounts[id].stop()
 		delete(accounts, id)
 		writeAccountsToFile(accountsFile)
 		return true
