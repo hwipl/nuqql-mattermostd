@@ -141,6 +141,18 @@ func (s *server) handleAccountSend(a *account, parts []string) {
 	a.client.sendMsg(channel, msg)
 }
 
+// handleAccountChatSend handles an account chat send command
+func (s *server) handleAccountChatSend(a *account, parts []string) {
+	// account <id> chat send <chat> <msg>
+	if len(parts) < 6 {
+		return
+	}
+	channel := parts[4]
+	msg := strings.Join(parts[5:], " ")
+	log.Println("sending message to channel "+channel+":", msg)
+	a.client.sendMsg(channel, msg)
+}
+
 // handleAccountChat handles an account chat command
 func (s *server) handleAccountChat(a *account, parts []string) {
 	// chat commands have at least 4 parts
@@ -157,7 +169,7 @@ func (s *server) handleAccountChat(a *account, parts []string) {
 	case "part":
 		log.Println("chat part NYI")
 	case "send":
-		log.Println("chat send NYI")
+		s.handleAccountChatSend(a, parts)
 	case "users":
 		log.Println("chat users NYI")
 	case "invite":
