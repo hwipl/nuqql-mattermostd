@@ -95,6 +95,7 @@ func addAccount(protocol, user, password string) int {
 	}
 	accounts[a.ID] = &a
 	writeAccountsToFile(accountsFile)
+	a.start()
 	return a.ID
 }
 
