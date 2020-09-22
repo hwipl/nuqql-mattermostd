@@ -85,6 +85,11 @@ func (m *mattermost) connect() {
 	}
 }
 
+// run starts the mattermost client
+func (m *mattermost) run() {
+	m.connect()
+}
+
 // runClient runs a mattermost client
 func runClient(server, username, password string) {
 	m := mattermost{
