@@ -90,12 +90,12 @@ func (m *mattermost) run() {
 	m.connect()
 }
 
-// runClient runs a mattermost client
-func runClient(server, username, password string) {
+// newClient creates a new mattermost client
+func newClient(server, username, password string) *mattermost {
 	m := mattermost{
 		server:   server,
 		username: username,
 		password: password,
 	}
-	m.connect()
+	return &m
 }

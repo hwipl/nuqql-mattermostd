@@ -140,6 +140,7 @@ func initAccounts() {
 		server := strings.Split(a.User, "@")[1]
 
 		// start client
-		go runClient(server, user, a.Password)
+		c := newClient(server, user, a.Password)
+		go c.run()
 	}
 }
