@@ -119,6 +119,16 @@ func (s *server) handleAccountDelete(id int) {
 
 }
 
+// handleAccountBuddies handles an account buddies command
+func (s *server) handleAccountBuddies(a *account) {
+	for _, b := range a.client.getBuddies() {
+		//buddy: <acc_id> status: <status> name: <name> alias: [alias]
+		m := fmt.Sprintf("buddy: %d status: %s name: %s alias: %s\r\n",
+			a.ID, b.status, b.user, b.name)
+		s.sendClient(m)
+	}
+}
+
 // handleAccountCommand handles an account command received from the client
 func (s *server) handleAccountCommand(parts []string) {
 	// account commands consist of at least 2 parts
@@ -159,7 +169,7 @@ func (s *server) handleAccountCommand(parts []string) {
 	case "delete":
 		s.handleAccountDelete(a.ID)
 	case "buddies":
-		log.Println("buddies", id, "NYI")
+		s.handleAccountBuddies(a)
 	case "collect":
 		log.Println("collect", id, "NYI")
 	case "send":
