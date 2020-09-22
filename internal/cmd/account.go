@@ -68,6 +68,15 @@ func addAccount(protocol, user, password string) int {
 	return a.ID
 }
 
+// delAccount removes the existing account with id
+func delAccount(id int) bool {
+	if accounts[id] != nil {
+		delete(accounts, id)
+		return true
+	}
+	return false
+}
+
 // readAccountsFromFile reads accounts from file
 func readAccountsFromFile(file string) {
 	// open file for reading
