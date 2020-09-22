@@ -25,6 +25,22 @@ type account struct {
 	Password string
 }
 
+// start starts the client for this account
+func (a *account) start() {
+	// skip non-mattermost accounts
+	if a.Protocol != "mattermost" {
+		return
+	}
+
+	// extract server and username from account user
+	user := strings.Split(a.User, "@")[0]
+	server := strings.Split(a.User, "@")[1]
+
+	// start client
+	c := newClient(server, user, a.Password)
+	go c.run()
+}
+
 // getAccount returns account with account ID
 func getAccount(id int) *account {
 	return accounts[id]
@@ -131,17 +147,6 @@ func startAccounts() {
 	// read accounts
 	readAccountsFromFile(accountsFile)
 	for _, a := range accounts {
-		// skip non-mattermost accounts
-		if a.Protocol != "mattermost" {
-			continue
-		}
-
-		// extract server and username from account user
-		user := strings.Split(a.User, "@")[0]
-		server := strings.Split(a.User, "@")[1]
-
-		// start client
-		c := newClient(server, user, a.Password)
-		go c.run()
+		a.start()
 	}
 }
