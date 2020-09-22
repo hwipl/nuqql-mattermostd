@@ -22,6 +22,34 @@ func getErrorMessage(err *model.AppError) string {
 	return err.Message + " " + err.Id + " " + err.DetailedError
 }
 
+// getBuddies returns a list of teams and channels the user is in
+func (m *mattermost) getBuddies() []*buddy {
+	var buddies []*buddy
+
+	// get teams
+	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
+	if resp.Error != nil {
+		log.Fatal(getErrorMessage(resp.Error))
+	}
+	for _, t := range teams {
+		// get channels
+		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
+			m.user.Id, false, "")
+		if resp.Error != nil {
+			log.Fatal(getErrorMessage(resp.Error))
+		}
+		for _, c := range channels {
+			user := t.Name + "/" + c.Name
+			name := c.DisplayName + " (" + t.DisplayName + ")"
+			status := "online"
+			b := newBuddy(user, name, status)
+			buddies = append(buddies, b)
+		}
+	}
+
+	return buddies
+}
+
 // handleWebSocketEvent handles events from the websocket
 func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	log.Println("WebSocket Event:", event.EventType())
