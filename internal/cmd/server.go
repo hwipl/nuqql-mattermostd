@@ -129,6 +129,18 @@ func (s *server) handleAccountBuddies(a *account) {
 	}
 }
 
+// handleAccountSend handles an account send command
+func (s *server) handleAccountSend(a *account, parts []string) {
+	// account <id> send <user> <msg>
+	if len(parts) < 5 {
+		return
+	}
+	channel := parts[3]
+	msg := strings.Join(parts[4:], " ")
+	log.Println("sending message to channel "+channel+":", msg)
+	a.client.sendMsg(channel, msg)
+}
+
 // handleAccountCommand handles an account command received from the client
 func (s *server) handleAccountCommand(parts []string) {
 	// account commands consist of at least 2 parts
@@ -173,7 +185,7 @@ func (s *server) handleAccountCommand(parts []string) {
 	case "collect":
 		log.Println("collect", id, "NYI")
 	case "send":
-		log.Println("send", id, "NYI")
+		s.handleAccountSend(a, parts)
 	case "status":
 		log.Println("status", id, "NYI")
 	case "chat":
