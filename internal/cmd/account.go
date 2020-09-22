@@ -39,12 +39,14 @@ func (a *account) start() {
 	server := strings.Split(a.User, "@")[1]
 
 	// start client
+	log.Println("Starting account", a.ID)
 	a.client = newClient(server, user, a.Password)
 	go a.client.run()
 }
 
 // stop shuts down the client for this account
 func (a *account) stop() {
+	log.Println("Stopping account", a.ID)
 	a.client.stop()
 }
 
