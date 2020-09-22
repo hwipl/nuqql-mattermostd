@@ -141,6 +141,30 @@ func (s *server) handleAccountSend(a *account, parts []string) {
 	a.client.sendMsg(channel, msg)
 }
 
+// handleAccountChat handles an account chat command
+func (s *server) handleAccountChat(a *account, parts []string) {
+	// chat commands have at least 4 parts
+	if len(parts) < 4 {
+		return
+	}
+
+	// handle chat subcommands
+	switch parts[3] {
+	case "list":
+		log.Println("chat list NYI")
+	case "join":
+		log.Println("chat join NYI")
+	case "part":
+		log.Println("chat part NYI")
+	case "send":
+		log.Println("chat send NYI")
+	case "users":
+		log.Println("chat users NYI")
+	case "invite":
+		log.Println("chat invite NYI")
+	}
+}
+
 // handleAccountCommand handles an account command received from the client
 func (s *server) handleAccountCommand(parts []string) {
 	// account commands consist of at least 2 parts
@@ -189,7 +213,7 @@ func (s *server) handleAccountCommand(parts []string) {
 	case "status":
 		log.Println("status", id, "NYI")
 	case "chat":
-		log.Println("chat", id, "NYI")
+		s.handleAccountChat(a, parts)
 	}
 }
 
