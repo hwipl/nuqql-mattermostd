@@ -159,3 +159,10 @@ func startAccounts() {
 		a.start()
 	}
 }
+
+// stopAccounts stops all accounts and their clients
+func stopAccounts() {
+	for _, a := range accounts {
+		a.stop()
+	}
+}

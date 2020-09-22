@@ -7,4 +7,7 @@ func Run() {
 
 	// start server
 	runServer()
+
+	// stop all accounts and client connections
+	stopAccounts()
 }
