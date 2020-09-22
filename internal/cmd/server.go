@@ -110,6 +110,15 @@ func (s *server) handleAccountAdd(parts []string) {
 	s.sendClient("info: new account added.\r\n")
 }
 
+// handleAccountDelete handles an account delete command
+func (s *server) handleAccountDelete(id int) {
+	if delAccount(id) {
+		log.Println("deleted account with id: ", id)
+		s.sendClient(fmt.Sprintf("info: account %d deleted.\r\n", id))
+	}
+
+}
+
 // handleAccountCommand handles an account command received from the client
 func (s *server) handleAccountCommand(parts []string) {
 	// account commands consist of at least 2 parts
@@ -148,7 +157,7 @@ func (s *server) handleAccountCommand(parts []string) {
 	// handle other commands
 	switch parts[2] {
 	case "delete":
-		log.Println("delete", id, "NYI")
+		s.handleAccountDelete(a.ID)
 	case "buddies":
 		log.Println("buddies", id, "NYI")
 	case "collect":
