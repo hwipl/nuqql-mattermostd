@@ -50,6 +50,17 @@ func (m *mattermost) getBuddies() []*buddy {
 	return buddies
 }
 
+// sendMsg sends a message to channel
+func (m *mattermost) sendMsg(channel string, msg string) {
+	post := &model.Post{}
+	post.ChannelId = channel
+	post.Message = msg
+
+	if _, resp := m.client.CreatePost(post); resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+	}
+}
+
 // handleWebSocketEvent handles events from the websocket
 func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	log.Println("WebSocket Event:", event.EventType())
