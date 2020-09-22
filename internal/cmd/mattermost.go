@@ -14,6 +14,7 @@ type mattermost struct {
 	client   *model.Client4
 	user     *model.User
 	websock  *model.WebSocketClient
+	done     chan bool
 }
 
 // getErrorMessage converts an AppError to a string
@@ -81,6 +82,8 @@ func (m *mattermost) connect() {
 		select {
 		case event := <-m.websock.EventChannel:
 			m.handleWebSocketEvent(event)
+		case <-m.done:
+			return
 		}
 	}
 }
@@ -90,12 +93,18 @@ func (m *mattermost) run() {
 	m.connect()
 }
 
+// stop shuts down the mattermost client
+func (m *mattermost) stop() {
+	m.done <- true
+}
+
 // newClient creates a new mattermost client
 func newClient(server, username, password string) *mattermost {
 	m := mattermost{
 		server:   server,
 		username: username,
 		password: password,
+		done:     make(chan bool, 1),
 	}
 	return &m
 }
