@@ -69,6 +69,7 @@ func addAccount(protocol, user, password string) int {
 		Password: password,
 	}
 	accounts[a.ID] = &a
+	writeAccountsToFile(accountsFile)
 	return a.ID
 }
 
@@ -76,6 +77,7 @@ func addAccount(protocol, user, password string) int {
 func delAccount(id int) bool {
 	if accounts[id] != nil {
 		delete(accounts, id)
+		writeAccountsToFile(accountsFile)
 		return true
 	}
 	return false
