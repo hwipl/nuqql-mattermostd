@@ -23,6 +23,8 @@ type account struct {
 	Protocol string
 	User     string
 	Password string
+
+	client *mattermost
 }
 
 // start starts the client for this account
@@ -37,8 +39,13 @@ func (a *account) start() {
 	server := strings.Split(a.User, "@")[1]
 
 	// start client
-	c := newClient(server, user, a.Password)
-	go c.run()
+	a.client = newClient(server, user, a.Password)
+	go a.client.run()
+}
+
+// stop shuts down the client for this account
+func (a *account) stop() {
+	a.client.stop()
 }
 
 // getAccount returns account with account ID
