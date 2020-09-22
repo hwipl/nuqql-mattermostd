@@ -139,6 +139,12 @@ func (s *server) handleAccountCommand(parts []string) {
 		return
 	}
 
+	// check if there is an account with this id
+	a := getAccount(int(id))
+	if a == nil {
+		return
+	}
+
 	// handle other commands
 	switch parts[2] {
 	case "delete":
