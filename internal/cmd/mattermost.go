@@ -39,7 +39,7 @@ func (m *mattermost) getBuddies() []*buddy {
 			log.Fatal(getErrorMessage(resp.Error))
 		}
 		for _, c := range channels {
-			user := t.Name + "/" + c.Name
+			user := c.Id
 			name := c.DisplayName + " (" + t.DisplayName + ")"
 			status := "online"
 			b := newBuddy(user, name, status)
