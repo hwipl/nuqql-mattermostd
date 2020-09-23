@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
+	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 )
@@ -65,6 +67,30 @@ func (m *mattermost) sendMsg(channel string, msg string) {
 // handleWebSocketEvent handles events from the websocket
 func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	log.Println("WebSocket Event:", event.EventType())
+
+	// only handle posted events
+	if event.Event != model.WEBSOCKET_EVENT_POSTED {
+		return
+	}
+
+	// handle post
+	post := model.PostFromJson(strings.NewReader(
+		event.Data["post"].(string)))
+	if post != nil {
+		// filter own messages
+		if post.UserId == m.user.Id {
+			return
+		}
+		log.Println("Message:", post.CreateAt, post.ChannelId,
+			post.UserId, post.Message)
+		// construct message with format:
+		// message: <acc_id> <destination> <timestamp> <sender> <msg>
+		// and send it via the client queue
+		msg := fmt.Sprintf("message: %d %s %d %s %s\r\n", m.accountID,
+			post.ChannelId, post.CreateAt/1000, post.UserId,
+			post.Message)
+		clientQueue.send(msg)
+	}
 }
 
 // connect connects to a mattermost server
