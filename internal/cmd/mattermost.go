@@ -83,11 +83,18 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		}
 		log.Println("Message:", post.CreateAt, post.ChannelId,
 			post.UserId, post.Message)
+
+		// get user who sent this message
+		user, resp := m.client.GetUser(post.UserId, "")
+		if resp.Error != nil {
+			log.Fatal(getErrorMessage(resp.Error))
+		}
+
 		// construct message with format:
 		// message: <acc_id> <destination> <timestamp> <sender> <msg>
 		// and send it via the client queue
 		msg := fmt.Sprintf("message: %d %s %d %s %s\r\n", m.accountID,
-			post.ChannelId, post.CreateAt/1000, post.UserId,
+			post.ChannelId, post.CreateAt/1000, user.Username,
 			post.Message)
 		clientQueue.send(msg)
 	}
