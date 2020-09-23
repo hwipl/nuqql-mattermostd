@@ -91,11 +91,11 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		}
 
 		// construct message with format:
-		// message: <acc_id> <destination> <timestamp> <sender> <msg>
+		// chat: msg: <acc_id> <chat> <timestamp> <sender> <message>
 		// and send it via the client queue
-		msg := fmt.Sprintf("message: %d %s %d %s %s\r\n", m.accountID,
-			post.ChannelId, post.CreateAt/1000, user.Username,
-			post.Message)
+		msg := fmt.Sprintf("chat: msg: %d %s %d %s %s\r\n",
+			m.accountID, post.ChannelId, post.CreateAt/1000,
+			user.Username, post.Message)
 		clientQueue.send(msg)
 	}
 }
