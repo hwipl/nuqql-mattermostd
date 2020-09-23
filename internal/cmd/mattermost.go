@@ -8,13 +8,14 @@ import (
 
 // mattermost stores mattermost client information
 type mattermost struct {
-	server   string
-	username string
-	password string
-	client   *model.Client4
-	user     *model.User
-	websock  *model.WebSocketClient
-	done     chan bool
+	accountID int
+	server    string
+	username  string
+	password  string
+	client    *model.Client4
+	user      *model.User
+	websock   *model.WebSocketClient
+	done      chan bool
 }
 
 // getErrorMessage converts an AppError to a string
@@ -138,12 +139,13 @@ func (m *mattermost) stop() {
 }
 
 // newClient creates a new mattermost client
-func newClient(server, username, password string) *mattermost {
+func newClient(accountID int, server, username, password string) *mattermost {
 	m := mattermost{
-		server:   server,
-		username: username,
-		password: password,
-		done:     make(chan bool, 1),
+		accountID: accountID,
+		server:    server,
+		username:  username,
+		password:  password,
+		done:      make(chan bool, 1),
 	}
 	return &m
 }
