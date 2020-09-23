@@ -68,16 +68,7 @@ type server struct {
 
 // sendClient sends msg to the client
 func (s *server) sendClient(msg string) {
-	w := bufio.NewWriter(s.conn)
-	n, err := w.WriteString(msg)
-	if n < len(msg) || err != nil {
-		s.clientActive = false
-		log.Println("send:", len(msg), n, err)
-	}
-	if err := w.Flush(); err != nil {
-		s.clientActive = false
-		log.Println("send flush:", err)
-	}
+	clientQueue.send(msg)
 }
 
 // handleAccountList handles an account list command
@@ -261,6 +252,10 @@ func (s *server) handleCommand(cmd string) {
 func (s *server) handleClient() {
 	defer s.conn.Close()
 	log.Println("New client connection", s.conn.RemoteAddr())
+
+	// configure client in queue
+	clientQueue.setClient(s.conn)
+	defer clientQueue.setClient(nil)
 
 	s.clientActive = true
 	r := bufio.NewReader(s.conn)
