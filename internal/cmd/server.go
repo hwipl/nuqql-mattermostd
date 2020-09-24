@@ -6,6 +6,7 @@ import (
 	"html"
 	"log"
 	"net"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -116,7 +117,7 @@ func (s *server) handleAccountBuddies(a *account) {
 	for _, b := range a.client.getBuddies() {
 		//buddy: <acc_id> status: <status> name: <name> alias: [alias]
 		m := fmt.Sprintf("buddy: %d status: %s name: %s alias: %s\r\n",
-			a.ID, b.status, b.user, b.name)
+			a.ID, b.status, b.user, url.PathEscape(b.name))
 		s.sendClient(m)
 	}
 }
@@ -138,7 +139,8 @@ func (s *server) handleAccountChatList(a *account) {
 	for _, b := range a.client.getBuddies() {
 		// chat: list: <acc_id> <chat_id> <chat_alias> <nick>
 		m := fmt.Sprintf("chat: list: %d %s %s %s\r\n",
-			a.ID, b.user, b.name, a.client.username)
+			a.ID, b.user, url.PathEscape(b.name),
+			a.client.username)
 		s.sendClient(m)
 	}
 }
