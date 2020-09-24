@@ -96,7 +96,7 @@ func addAccount(protocol, user, password string) int {
 		Password: password,
 	}
 	accounts[a.ID] = &a
-	writeAccountsToFile(accountsFile)
+	writeAccountsToFile()
 	a.start()
 	return a.ID
 }
@@ -106,7 +106,7 @@ func delAccount(id int) bool {
 	if accounts[id] != nil {
 		accounts[id].stop()
 		delete(accounts, id)
-		writeAccountsToFile(accountsFile)
+		writeAccountsToFile()
 		return true
 	}
 	return false
@@ -140,7 +140,15 @@ func readAccountsFromFile() {
 }
 
 // writeAccountsToFile writes all accounts to file
-func writeAccountsToFile(file string) {
+func writeAccountsToFile() {
+	file := conf.dir + accountsFile
+
+	// make sure directory exists
+	err := os.MkdirAll(conf.dir, 0700)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// open file for writing
 	f, err := os.Create(file)
 	if err != nil {
