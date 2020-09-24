@@ -113,7 +113,9 @@ func delAccount(id int) bool {
 }
 
 // readAccountsFromFile reads accounts from file
-func readAccountsFromFile(file string) {
+func readAccountsFromFile() {
+	file := conf.dir + accountsFile
+
 	// open file for reading
 	f, err := os.Open(file)
 	if err != nil {
@@ -164,7 +166,7 @@ func writeAccountsToFile(file string) {
 // startAccounts initializes all accounts and starts their clients
 func startAccounts() {
 	// read accounts
-	readAccountsFromFile(accountsFile)
+	readAccountsFromFile()
 	for _, a := range accounts {
 		a.start()
 	}
