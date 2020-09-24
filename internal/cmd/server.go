@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"html"
 	"log"
 	"net"
 	"strconv"
@@ -129,7 +130,7 @@ func (s *server) handleAccountSend(a *account, parts []string) {
 	channel := parts[3]
 	msg := strings.Join(parts[4:], " ")
 	log.Println("sending message to channel "+channel+":", msg)
-	a.client.sendMsg(channel, msg)
+	a.client.sendMsg(channel, html.UnescapeString(msg))
 }
 
 // handleAccountChatList handles an account chat list command
@@ -151,7 +152,7 @@ func (s *server) handleAccountChatSend(a *account, parts []string) {
 	channel := parts[4]
 	msg := strings.Join(parts[5:], " ")
 	log.Println("sending message to channel "+channel+":", msg)
-	a.client.sendMsg(channel, msg)
+	a.client.sendMsg(channel, html.UnescapeString(msg))
 }
 
 // handleAccountChat handles an account chat command
