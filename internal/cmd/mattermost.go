@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"html"
 	"log"
 	"strings"
 
@@ -95,7 +96,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		// and send it via the client queue
 		msg := fmt.Sprintf("chat: msg: %d %s %d %s %s\r\n",
 			m.accountID, post.ChannelId, post.CreateAt/1000,
-			user.Username, post.Message)
+			user.Username, html.EscapeString(post.Message))
 		clientQueue.send(msg)
 	}
 }
