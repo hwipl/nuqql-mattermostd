@@ -46,8 +46,10 @@ func (a *account) start() {
 
 // stop shuts down the client for this account
 func (a *account) stop() {
-	log.Println("Stopping account", a.ID)
-	a.client.stop()
+	if a.client != nil {
+		log.Println("Stopping account", a.ID)
+		a.client.stop()
+	}
 }
 
 // getAccount returns account with account ID
