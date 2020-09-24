@@ -309,8 +309,8 @@ func (s *server) run() {
 // runServer runs the server that handles nuqql/telnet connections
 func runServer() {
 	server := server{
-		network: "tcp",
-		address: "localhost:32000",
+		network: conf.getListenNetwork(),
+		address: conf.getListenAddress(),
 	}
 	server.run()
 }
