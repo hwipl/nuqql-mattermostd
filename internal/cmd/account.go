@@ -145,6 +145,12 @@ func writeAccountsToFile(file string) {
 		log.Fatal(err)
 	}
 
+	// make sure file is only readable and writable by the current user
+	err = os.Chmod(file, 0600)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// write accounts to file
 	enc := json.NewEncoder(f)
 	for _, a := range accounts {
