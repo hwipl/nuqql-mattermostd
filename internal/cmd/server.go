@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -282,6 +283,13 @@ func (s *server) handleClient() {
 
 // run runs the server
 func (s *server) run() {
+	if s.network == "unix" {
+		// remove old socket file
+		if err := os.Remove(s.address); err != nil {
+			log.Println(err)
+		}
+	}
+
 	// start listener
 	l, err := net.Listen(s.network, s.address)
 	if err != nil {
