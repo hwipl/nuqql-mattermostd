@@ -143,12 +143,6 @@ func readAccountsFromFile() {
 func writeAccountsToFile() {
 	file := conf.dir + accountsFile
 
-	// make sure directory exists
-	err := os.MkdirAll(conf.dir, 0700)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	// open file for writing
 	f, err := os.Create(file)
 	if err != nil {
