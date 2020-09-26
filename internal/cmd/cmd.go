@@ -1,9 +1,26 @@
 package cmd
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"os"
 )
+
+// parseCommandLine parses the command line arguments
+func parseCommandLine() {
+	// configure command line arguments
+	version := flag.Bool("v", false, "show version and exit")
+
+	// parse command line arguments
+	flag.Parse()
+
+	// handle version command line argument
+	if *version {
+		fmt.Println("0.0dev")
+		os.Exit(0)
+	}
+}
 
 // initDirectory makes sure the working directory exists
 func initDirectory() {
@@ -16,6 +33,9 @@ func initDirectory() {
 
 // Run is the main entry point
 func Run() {
+	// parse command line arguments
+	parseCommandLine()
+
 	// make sure working directory exists
 	initDirectory()
 
