@@ -9,12 +9,16 @@ import (
 
 // parseCommandLine parses the command line arguments
 func parseCommandLine() {
+	var port uint
+
 	// configure command line arguments
 	version := flag.Bool("v", false, "show version and exit")
 	flag.StringVar(&conf.af, "af", conf.af, "set socket address "+
 		"`family`: \"inet\" for AF_INET, \"unix\" for AF_UNIX")
 	flag.StringVar(&conf.address, "address", conf.address,
 		"set AF_INET listen `address`")
+	flag.UintVar(&port, "port", uint(conf.port),
+		"set AF_INET listen `port`")
 
 	// parse command line arguments
 	flag.Parse()
@@ -24,6 +28,12 @@ func parseCommandLine() {
 		fmt.Println("0.0dev")
 		os.Exit(0)
 	}
+
+	// parse port number
+	if port > 65535 {
+		log.Fatal("error parsing port ", port)
+	}
+	conf.port = uint16(port)
 }
 
 // initDirectory makes sure the working directory exists
