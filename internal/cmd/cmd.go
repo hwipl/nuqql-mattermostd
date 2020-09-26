@@ -11,6 +11,8 @@ import (
 func parseCommandLine() {
 	// configure command line arguments
 	version := flag.Bool("v", false, "show version and exit")
+	flag.StringVar(&conf.af, "af", conf.af, "set socket address "+
+		"`family`: \"inet\" for AF_INET, \"unix\" for AF_UNIX")
 
 	// parse command line arguments
 	flag.Parse()
