@@ -21,6 +21,8 @@ func parseCommandLine() {
 	flag.StringVar(&conf.dir, "dir", conf.dir, "set working `directory`")
 	loglevel := flag.String("loglevel", "",
 		"set logging `level`: debug, info, warn, error")
+	disableHistory := flag.Bool("disable-history", false,
+		"disable message history")
 
 	// parse command line arguments
 	flag.Parse()
@@ -41,6 +43,11 @@ func parseCommandLine() {
 	if *loglevel != "" {
 		log.Println("loglevel NYI")
 		conf.loglevel = *loglevel
+	}
+
+	// handle disable history
+	if *disableHistory {
+		log.Println("disable history NYI")
 	}
 }
 
