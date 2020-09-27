@@ -26,6 +26,8 @@ type config struct {
 	port uint16
 	// sockfile is the AF_UNIX socket file in the working directory
 	sockfile string
+	// loglevel is the logging level: debug, info, warn, error
+	loglevel string
 }
 
 // getListenNetwork returns the listen network string based on the configured
@@ -67,6 +69,7 @@ func newConfig(name string) *config {
 		address:  "localhost",
 		port:     32000,
 		sockfile: name + ".sock",
+		loglevel: "debug",
 	}
 	return &c
 }
