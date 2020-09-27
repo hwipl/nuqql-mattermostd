@@ -23,6 +23,8 @@ func parseCommandLine() {
 		"set logging `level`: debug, info, warn, error")
 	disableHistory := flag.Bool("disable-history", false,
 		"disable message history")
+	pushAccounts := flag.Bool("push-accounts", false,
+		"push accounts to client")
 
 	// parse command line arguments
 	flag.Parse()
@@ -48,6 +50,11 @@ func parseCommandLine() {
 	// handle disable history
 	if *disableHistory {
 		log.Println("disable history NYI")
+	}
+
+	// handle push accounts
+	if *pushAccounts {
+		log.Println("push accounts NYI")
 	}
 }
 
