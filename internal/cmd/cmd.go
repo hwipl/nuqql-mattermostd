@@ -19,7 +19,7 @@ func parseCommandLine() {
 	flag.StringVar(&conf.sockfile, "sockfile", conf.sockfile,
 		"set AF_UNIX socket `file` in working directory")
 	flag.StringVar(&conf.dir, "dir", conf.dir, "set working `directory`")
-	flag.StringVar(&conf.loglevel, "loglevel", conf.loglevel,
+	loglevel := flag.String("loglevel", "",
 		"set logging `level`: debug, info, warn, error")
 
 	// parse command line arguments
@@ -36,6 +36,12 @@ func parseCommandLine() {
 		log.Fatal("error parsing port ", *port)
 	}
 	conf.port = uint16(*port)
+
+	// handle log level
+	if *loglevel != "" {
+		log.Println("loglevel NYI")
+		conf.loglevel = *loglevel
+	}
 }
 
 // initDirectory makes sure the working directory exists
