@@ -19,6 +19,8 @@ func parseCommandLine() {
 	flag.StringVar(&conf.sockfile, "sockfile", conf.sockfile,
 		"set AF_UNIX socket `file` in working directory")
 	flag.StringVar(&conf.dir, "dir", conf.dir, "set working `directory`")
+	flag.StringVar(&conf.loglevel, "loglevel", conf.loglevel,
+		"set logging `level`: debug, info, warn, error")
 
 	// parse command line arguments
 	flag.Parse()
