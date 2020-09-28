@@ -45,7 +45,7 @@ func (m *mattermost) getBuddies() []*buddy {
 		for _, c := range channels {
 			user := c.Id
 			name := c.DisplayName + " (" + t.DisplayName + ")"
-			status := "online"
+			status := "GROUP_CHAT"
 			b := newBuddy(user, name, status)
 			buddies = append(buddies, b)
 		}
