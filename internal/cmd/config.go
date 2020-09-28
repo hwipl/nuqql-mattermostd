@@ -15,7 +15,7 @@ var (
 type config struct {
 	// name is the name of this configuration, e.g., "nuqql-mattermostd"
 	name string
-	// dir is the working directory including trailing "/"
+	// dir is the working directory
 	dir string
 	// af is the address family of the server socket:
 	// inet (for AF_INET) or unix (for AF_UNIX)
@@ -47,7 +47,7 @@ func (c *config) getListenNetwork() string {
 // address family
 func (c *config) getListenAddress() string {
 	if c.af == "unix" {
-		return c.dir + c.sockfile
+		return filepath.Join(c.dir, c.sockfile)
 	}
 
 	// treat everything else as inet
@@ -61,7 +61,7 @@ func newConfig(name string) *config {
 	if err != nil {
 		log.Fatal(err)
 	}
-	dir := filepath.FromSlash(confDir + "/" + name + "/")
+	dir := filepath.Join(confDir, name)
 
 	// create and return config
 	c := config{

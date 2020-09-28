@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 )
@@ -114,7 +115,7 @@ func delAccount(id int) bool {
 
 // readAccountsFromFile reads accounts from file
 func readAccountsFromFile() {
-	file := conf.dir + accountsFile
+	file := filepath.Join(conf.dir, accountsFile)
 
 	// open file for reading
 	f, err := os.Open(file)
@@ -141,7 +142,7 @@ func readAccountsFromFile() {
 
 // writeAccountsToFile writes all accounts to file
 func writeAccountsToFile() {
-	file := conf.dir + accountsFile
+	file := filepath.Join(conf.dir, accountsFile)
 
 	// open file for writing
 	f, err := os.Create(file)
