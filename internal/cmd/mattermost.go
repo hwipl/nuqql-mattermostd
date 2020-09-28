@@ -26,6 +26,24 @@ func getErrorMessage(err *model.AppError) string {
 	return err.Message + " " + err.Id + " " + err.DetailedError
 }
 
+// getChannelName returns the name of the channel c
+func (m *mattermost) getChannelName(c *model.Channel) string {
+	// direct channels do not seem to set a display name; construct a name
+	// from the other user's username
+	if c.Type == model.CHANNEL_DIRECT {
+		// get and use name of other user
+		user, resp := m.client.GetUser(
+			c.GetOtherUserIdForDM(m.user.Id), "")
+		if resp.Error != nil {
+			log.Fatal(getErrorMessage(resp.Error))
+		}
+		return user.Username
+	}
+
+	// use display name for other channel types
+	return c.DisplayName
+}
+
 // getBuddies returns a list of teams and channels the user is in
 func (m *mattermost) getBuddies() []*buddy {
 	var buddies []*buddy
@@ -44,7 +62,8 @@ func (m *mattermost) getBuddies() []*buddy {
 		}
 		for _, c := range channels {
 			user := c.Id
-			name := c.DisplayName + " (" + t.DisplayName + ")"
+			name := m.getChannelName(c) +
+				" (" + t.DisplayName + ")"
 			status := "GROUP_CHAT"
 			b := newBuddy(user, name, status)
 			buddies = append(buddies, b)
