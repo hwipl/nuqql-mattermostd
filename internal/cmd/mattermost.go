@@ -32,8 +32,13 @@ func (m *mattermost) getChannelName(c *model.Channel) string {
 	// from the other user's username
 	if c.Type == model.CHANNEL_DIRECT {
 		// get and use name of other user
-		user, resp := m.client.GetUser(
-			c.GetOtherUserIdForDM(m.user.Id), "")
+		other := c.GetOtherUserIdForDM(m.user.Id)
+		if other == "" {
+			// there is no other user, seems like we are chatting
+			// with ourselves
+			return m.user.Username
+		}
+		user, resp := m.client.GetUser(other, "")
 		if resp.Error != nil {
 			log.Fatal(getErrorMessage(resp.Error))
 		}
