@@ -261,7 +261,15 @@ func (s *server) handleClient() {
 	clientQueue.setClient(s.conn)
 	defer clientQueue.setClient(nil)
 
+	// enable client
 	s.clientActive = true
+
+	// if push accounts is enabled, send list of accounts to client
+	if conf.pushAccounts {
+		s.handleAccountList()
+	}
+
+	// start client command handling loop
 	r := bufio.NewReader(s.conn)
 	c := ""
 	for s.clientActive {
