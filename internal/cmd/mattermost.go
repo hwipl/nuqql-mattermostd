@@ -89,6 +89,36 @@ func (m *mattermost) sendMsg(channel string, msg string) {
 	}
 }
 
+// getPostFiles returns the files attached to post as a string
+func (m *mattermost) getPostFiles(post *model.Post) string {
+	// return empty string if there are no files attached
+	if len(post.Metadata.Files) == 0 {
+		return ""
+	}
+
+	// construct and return file info string
+	fileInfo := ""
+	for _, f := range post.Metadata.Files {
+		// try to create public link for the file
+		link, resp := m.client.GetFileLink(f.Id)
+		if resp.Error != nil {
+			log.Println(getErrorMessage(resp.Error))
+		}
+
+		// separate files with commas
+		if fileInfo != "" {
+			fileInfo += ", "
+		}
+
+		// attach link to file name if present
+		fileInfo += f.Name
+		if link != "" {
+			fileInfo += fmt.Sprintf(" (%s)", link)
+		}
+	}
+	return fmt.Sprintf("*** Attached files: [%s] ***", fileInfo)
+}
+
 // handleWebSocketEvent handles events from the websocket
 func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	log.Println("WebSocket Event:", event.EventType())
@@ -106,8 +136,17 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		if post.UserId == m.user.Id {
 			return
 		}
+
+		// construct message text including attached files
+		text := post.Message
+		if fileInfo := m.getPostFiles(post); fileInfo != "" {
+			if text != "" {
+				text += "\n"
+			}
+			text += fileInfo
+		}
 		log.Println("Message:", post.CreateAt, post.ChannelId,
-			post.UserId, post.Message)
+			post.UserId, text)
 
 		// get user who sent this message
 		user, resp := m.client.GetUser(post.UserId, "")
@@ -120,7 +159,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		// and send it via the client queue
 		msg := fmt.Sprintf("chat: msg: %d %s %d %s %s\r\n",
 			m.accountID, post.ChannelId, post.CreateAt/1000,
-			user.Username, html.EscapeString(post.Message))
+			user.Username, html.EscapeString(text))
 		clientQueue.send(msg)
 	}
 }
