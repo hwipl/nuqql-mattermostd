@@ -94,13 +94,13 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	log.Println("WebSocket Event:", event.EventType())
 
 	// only handle posted events
-	if event.Event != model.WEBSOCKET_EVENT_POSTED {
+	if event.EventType() != model.WEBSOCKET_EVENT_POSTED {
 		return
 	}
 
 	// handle post
 	post := model.PostFromJson(strings.NewReader(
-		event.Data["post"].(string)))
+		event.GetData()["post"].(string)))
 	if post != nil {
 		// filter own messages
 		if post.UserId == m.user.Id {
