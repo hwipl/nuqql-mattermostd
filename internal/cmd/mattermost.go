@@ -99,11 +99,8 @@ func (m *mattermost) getPostFiles(post *model.Post) string {
 	// construct and return file info string
 	fileInfo := ""
 	for _, f := range post.Metadata.Files {
-		// try to create public link for the file
-		link, resp := m.client.GetFileLink(f.Id)
-		if resp.Error != nil {
-			log.Println(getErrorMessage(resp.Error))
-		}
+		// create link for the file
+		link := m.client.ApiUrl + m.client.GetFileRoute(f.Id)
 
 		// separate files with commas
 		if fileInfo != "" {
@@ -111,10 +108,7 @@ func (m *mattermost) getPostFiles(post *model.Post) string {
 		}
 
 		// attach link to file name if present
-		fileInfo += f.Name
-		if link != "" {
-			fileInfo += fmt.Sprintf(" (%s)", link)
-		}
+		fileInfo += fmt.Sprintf("%s (%s)", f.Name, link)
 	}
 	return fmt.Sprintf("*** Attached files: [%s] ***", fileInfo)
 }
