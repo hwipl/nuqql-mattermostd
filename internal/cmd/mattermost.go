@@ -132,7 +132,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		text := post.Message
 		if fileInfo := m.getPostFiles(post); fileInfo != "" {
 			if text != "" {
-				text += "\n"
+				text += "\n\n"
 			}
 			text += fileInfo
 		}
