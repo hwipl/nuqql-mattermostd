@@ -97,20 +97,15 @@ func (m *mattermost) getPostFiles(post *model.Post) string {
 	}
 
 	// construct and return file info string
-	fileInfo := ""
+	fileInfo := "---- Attachments:"
 	for _, f := range post.Metadata.Files {
 		// create link for the file
 		link := m.client.ApiUrl + m.client.GetFileRoute(f.Id)
 
-		// separate files with commas
-		if fileInfo != "" {
-			fileInfo += ", "
-		}
-
 		// attach link to file name if present
-		fileInfo += fmt.Sprintf("%s (%s)", f.Name, link)
+		fileInfo += fmt.Sprintf("\n* %s:\n  %s", f.Name, link)
 	}
-	return fmt.Sprintf("*** Attached files: [%s] ***", fileInfo)
+	return fileInfo
 }
 
 // handleWebSocketEvent handles events from the websocket
