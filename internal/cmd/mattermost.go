@@ -103,7 +103,9 @@ func (m *mattermost) getPostFiles(post *model.Post) string {
 		link := m.client.ApiUrl + m.client.GetFileRoute(f.Id)
 
 		// attach link to file name if present
-		fileInfo += fmt.Sprintf("\n* %s:\n  %s", f.Name, link)
+		fileInfo += fmt.Sprintf(
+			"\n* Name: %s\n  Type: %s\n  Size: %dB\n  Link: %s",
+			f.Name, f.MimeType, f.Size, link)
 	}
 	return fileInfo
 }
