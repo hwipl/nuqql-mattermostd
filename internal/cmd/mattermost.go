@@ -36,6 +36,30 @@ func (m *mattermost) getStatus() string {
 	return status.Status
 }
 
+// setStatus sets our status
+func (m *mattermost) setStatus(status string) {
+	// check if status is valid:
+	// valid user status can be online, away, offline and dnd
+	switch status {
+	case "online":
+	case "away":
+	case "offline":
+	case "dnd":
+	default:
+		return // invalid status
+	}
+
+	// set status
+	s := model.Status{
+		UserId: m.user.Id,
+		Status: status,
+	}
+	_, resp := m.client.UpdateUserStatus(m.user.Id, &s)
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+	}
+}
+
 // getChannelName returns the name of the channel c
 func (m *mattermost) getChannelName(c *model.Channel) string {
 	// direct channels do not seem to set a display name; construct a name

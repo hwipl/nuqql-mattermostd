@@ -149,6 +149,18 @@ func (s *server) handleAccountStatusGet(a *account) {
 	s.sendClient(m)
 }
 
+// handleAccountStatusSet handles an account status set command
+func (s *server) handleAccountStatusSet(a *account, parts []string) {
+	// account <id> status set <status>
+	if len(parts) < 5 {
+		return
+	}
+
+	// try to set status
+	status := parts[4]
+	a.client.setStatus(status)
+}
+
 // handleAccountStatus handles an account status command
 func (s *server) handleAccountStatus(a *account, parts []string) {
 	// status commands have at least 4 parts
@@ -161,7 +173,7 @@ func (s *server) handleAccountStatus(a *account, parts []string) {
 	case "get":
 		s.handleAccountStatusGet(a)
 	case "set":
-		log.Println("status set NYI")
+		s.handleAccountStatusSet(a, parts)
 	}
 }
 
