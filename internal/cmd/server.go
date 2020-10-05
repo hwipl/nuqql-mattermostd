@@ -200,6 +200,25 @@ func (s *server) handleAccountChatSend(a *account, parts []string) {
 	a.client.sendMsg(channel, html.UnescapeString(msg))
 }
 
+// handleAccountChat handles an account chat users command
+func (s *server) handleAccountChatUsers(a *account, parts []string) {
+	// account <id> chat users <chat>
+	if len(parts) < 5 {
+		return
+	}
+
+	channel := parts[4]
+	users := a.client.getChannelUsers(channel)
+	for _, u := range users {
+		// create and send message with format:
+		// chat: user: <acc_id> <chat> <name> <alias> <state>
+		m := fmt.Sprintf("chat: user: %d %s %s %s %s\r\n",
+			a.ID, channel, u.user, url.PathEscape(u.name),
+			u.status)
+		s.sendClient(m)
+	}
+}
+
 // handleAccountChat handles an account chat command
 func (s *server) handleAccountChat(a *account, parts []string) {
 	// chat commands have at least 4 parts
@@ -218,7 +237,7 @@ func (s *server) handleAccountChat(a *account, parts []string) {
 	case "send":
 		s.handleAccountChatSend(a, parts)
 	case "users":
-		log.Println("chat users NYI")
+		s.handleAccountChatUsers(a, parts)
 	case "invite":
 		log.Println("chat invite NYI")
 	}

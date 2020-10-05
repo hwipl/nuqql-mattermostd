@@ -60,6 +60,40 @@ func (m *mattermost) setStatus(status string) {
 	}
 }
 
+// getChannelUsers returns a list of users in channel
+func (m *mattermost) getChannelUsers(channel string) []*buddy {
+	var buddies []*buddy
+
+	// retrieve channel members
+	members, resp := m.client.GetChannelMembers(channel, 0, 60, "")
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+		return nil
+	}
+
+	// try to get user information of channel members
+	for _, member := range *members {
+		// user name
+		user, resp := m.client.GetUser(member.UserId, "")
+		if resp.Error != nil {
+			log.Println(getErrorMessage(resp.Error))
+			return nil
+		}
+		// user status
+		status, resp := m.client.GetUserStatus(user.Id, "")
+		if resp.Error != nil {
+			log.Println(getErrorMessage(resp.Error))
+			return nil
+		}
+
+		// add user to list
+		b := newBuddy(user.Id, user.Username, status.Status)
+		buddies = append(buddies, b)
+	}
+
+	return buddies
+}
+
 // getChannelName returns the name of the channel c
 func (m *mattermost) getChannelName(c *model.Channel) string {
 	// direct channels do not seem to set a display name; construct a name
