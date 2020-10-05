@@ -26,6 +26,16 @@ func getErrorMessage(err *model.AppError) string {
 	return err.Message + " " + err.Id + " " + err.DetailedError
 }
 
+// getStatus returns our status
+func (m *mattermost) getStatus() string {
+	status, resp := m.client.GetUserStatus(m.user.Id, "")
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+		return ""
+	}
+	return status.Status
+}
+
 // getChannelName returns the name of the channel c
 func (m *mattermost) getChannelName(c *model.Channel) string {
 	// direct channels do not seem to set a display name; construct a name

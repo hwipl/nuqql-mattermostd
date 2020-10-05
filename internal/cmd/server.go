@@ -135,6 +135,36 @@ func (s *server) handleAccountSend(a *account, parts []string) {
 	a.client.sendMsg(channel, html.UnescapeString(msg))
 }
 
+// handleAccountStatusGet handles an account status get command
+func (s *server) handleAccountStatusGet(a *account) {
+	// account <id> status get
+	status := a.client.getStatus()
+	if status == "" {
+		return
+	}
+
+	// create and send status message with format:
+	// status: account <acc_id> status: <status>
+	m := fmt.Sprintf("status: account %d status: %s\r\n", a.ID, status)
+	s.sendClient(m)
+}
+
+// handleAccountStatus handles an account status command
+func (s *server) handleAccountStatus(a *account, parts []string) {
+	// status commands have at least 4 parts
+	if len(parts) < 4 {
+		return
+	}
+
+	// handle status commands
+	switch parts[3] {
+	case "get":
+		s.handleAccountStatusGet(a)
+	case "set":
+		log.Println("status set NYI")
+	}
+}
+
 // handleAccountChatList handles an account chat list command
 func (s *server) handleAccountChatList(a *account) {
 	for _, b := range a.client.getBuddies() {
@@ -228,7 +258,7 @@ func (s *server) handleAccountCommand(parts []string) {
 	case "send":
 		s.handleAccountSend(a, parts)
 	case "status":
-		log.Println("status", id, "NYI")
+		s.handleAccountStatus(a, parts)
 	case "chat":
 		s.handleAccountChat(a, parts)
 	}
