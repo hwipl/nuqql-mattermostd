@@ -108,7 +108,9 @@ func (m *mattermost) getChannelName(c *model.Channel) string {
 		}
 		user, resp := m.client.GetUser(other, "")
 		if resp.Error != nil {
-			log.Fatal(getErrorMessage(resp.Error))
+			// cannot retrieve username, fallback to id
+			log.Println(getErrorMessage(resp.Error))
+			return other
 		}
 		return user.Username
 	}
