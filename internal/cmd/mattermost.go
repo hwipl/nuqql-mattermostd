@@ -126,14 +126,16 @@ func (m *mattermost) getBuddies() []*buddy {
 	// get teams
 	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
 	if resp.Error != nil {
-		log.Fatal(getErrorMessage(resp.Error))
+		log.Println(getErrorMessage(resp.Error))
+		return nil
 	}
 	for _, t := range teams {
 		// get channels
 		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
 			m.user.Id, false, "")
 		if resp.Error != nil {
-			log.Fatal(getErrorMessage(resp.Error))
+			log.Println(getErrorMessage(resp.Error))
+			return nil
 		}
 		for _, c := range channels {
 			user := c.Id
