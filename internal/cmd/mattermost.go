@@ -13,9 +13,9 @@ var (
 	// filterOwn toggles filtering of own messages
 	filterOwn = true
 
-	// httpPrefix is appended to the server to form a http url
+	// httpPrefix is prepended to the server to form a http url
 	httpPrefix = "https://"
-	// webSocketPrefix is appended to the server to form a websocket url
+	// webSocketPrefix is prepended to the server to form a websocket url
 	webSocketPrefix = "wss://"
 )
 
@@ -244,7 +244,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 func (m *mattermost) connect() {
 	m.client = model.NewAPIv4Client(httpPrefix + m.server)
 
-	// check is server is running
+	// check if server is running
 	props, resp := m.client.GetOldClientConfig("")
 	if resp.Error != nil {
 		log.Fatal(getErrorMessage(resp.Error))
