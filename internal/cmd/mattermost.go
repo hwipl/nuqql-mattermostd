@@ -211,10 +211,13 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		log.Println("Message:", post.CreateAt, post.ChannelId,
 			post.UserId, text)
 
-		// get user who sent this message
+		// get name of user who sent this message
+		username := post.UserId
 		user, resp := m.client.GetUser(post.UserId, "")
 		if resp.Error != nil {
-			log.Fatal(getErrorMessage(resp.Error))
+			log.Println(getErrorMessage(resp.Error))
+		} else {
+			username = user.Username
 		}
 
 		// construct message with format:
@@ -222,7 +225,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		// and send it via the client queue
 		msg := fmt.Sprintf("chat: msg: %d %s %d %s %s\r\n",
 			m.accountID, post.ChannelId, post.CreateAt/1000,
-			user.Username, html.EscapeString(text))
+			username, html.EscapeString(text))
 		clientQueue.send(msg)
 	}
 }
