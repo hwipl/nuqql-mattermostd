@@ -15,6 +15,8 @@ var (
 
 	// httpPrefix is appended to the server to form a http url
 	httpPrefix = "https://"
+	// webSocketPrefix is appended to the server to form a websocket url
+	webSocketPrefix = "wss://"
 )
 
 // mattermost stores mattermost client information
@@ -279,7 +281,7 @@ func (m *mattermost) connect() {
 	}
 
 	// create websocket and start listening for events
-	websock, err := model.NewWebSocketClient4("ws://"+m.server,
+	websock, err := model.NewWebSocketClient4(webSocketPrefix+m.server,
 		m.client.AuthToken)
 	if err != nil {
 		log.Fatal(getErrorMessage(err))
