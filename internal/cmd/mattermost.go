@@ -12,6 +12,9 @@ import (
 var (
 	// filterOwn toggles filtering of own messages
 	filterOwn = true
+
+	// httpPrefix is appended to the server to form a http url
+	httpPrefix = "https://"
 )
 
 // mattermost stores mattermost client information
@@ -237,7 +240,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 
 // connect connects to a mattermost server
 func (m *mattermost) connect() {
-	m.client = model.NewAPIv4Client("http://" + m.server)
+	m.client = model.NewAPIv4Client(httpPrefix + m.server)
 
 	// check is server is running
 	props, resp := m.client.GetOldClientConfig("")
