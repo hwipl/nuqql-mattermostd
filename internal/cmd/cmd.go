@@ -25,6 +25,8 @@ func parseCommandLine() {
 		"disable message history")
 	flag.BoolVar(&conf.pushAccounts, "push-accounts", conf.pushAccounts,
 		"push accounts to client")
+	disableFilterOwn := flag.Bool("disable-filterown", false,
+		"disable filtering of own messages")
 
 	// parse command line arguments
 	flag.Parse()
@@ -50,6 +52,11 @@ func parseCommandLine() {
 	// handle disable history
 	if *disableHistory {
 		log.Println("disable history NYI")
+	}
+
+	// handle disable filter own
+	if *disableFilterOwn {
+		filterOwn = false
 	}
 }
 
