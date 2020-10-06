@@ -27,6 +27,8 @@ func parseCommandLine() {
 		"push accounts to client")
 	disableFilterOwn := flag.Bool("disable-filterown", false,
 		"disable filtering of own messages")
+	disableEncryption := flag.Bool("disable-encryption", false,
+		"disable TLS encryption")
 
 	// parse command line arguments
 	flag.Parse()
@@ -57,6 +59,12 @@ func parseCommandLine() {
 	// handle disable filter own
 	if *disableFilterOwn {
 		filterOwn = false
+	}
+
+	// handle disable encryption
+	if *disableEncryption {
+		httpPrefix = "http://"
+		webSocketPrefix = "ws://"
 	}
 }
 
