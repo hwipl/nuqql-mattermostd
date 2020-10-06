@@ -9,6 +9,11 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
+var (
+	// filterOwn toggles filtering of own messages
+	filterOwn = true
+)
+
 // mattermost stores mattermost client information
 type mattermost struct {
 	accountID int
@@ -196,7 +201,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		event.GetData()["post"].(string)))
 	if post != nil {
 		// filter own messages
-		if post.UserId == m.user.Id {
+		if post.UserId == m.user.Id && filterOwn {
 			return
 		}
 
