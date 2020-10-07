@@ -85,6 +85,38 @@ func (m *mattermost) joinChannel(teamChannel string) {
 	}
 }
 
+// partChannel leaves channel
+func (m *mattermost) partChannel(teamChannel string) {
+	// get team and channel name
+	tc := strings.Split(teamChannel, "/")
+	if len(tc) != 2 {
+		return
+	}
+	team := tc[0]
+	channel := tc[1]
+
+	// get team id
+	t, resp := m.client.GetTeamByName(team, "")
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+		return
+	}
+
+	// check if channel exists
+	c, resp := m.client.GetChannelByName(channel, t.Id, "")
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+		return
+	}
+
+	// remove current user from channel
+	_, resp = m.client.RemoveUserFromChannel(c.Id, m.user.Id)
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+		return
+	}
+}
+
 // getStatus returns our status
 func (m *mattermost) getStatus() string {
 	status, resp := m.client.GetUserStatus(m.user.Id, "")
