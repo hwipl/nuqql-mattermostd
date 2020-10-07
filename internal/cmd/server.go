@@ -188,6 +188,17 @@ func (s *server) handleAccountChatList(a *account) {
 	}
 }
 
+// handleAccountChatJoin handles an account chat join command
+func (s *server) handleAccountChatJoin(a *account, parts []string) {
+	// account <id> chat join <chat>
+	if len(parts) < 5 {
+		return
+	}
+	channel := parts[4]
+	log.Println("joining channel " + channel)
+	a.client.joinChannel(channel)
+}
+
 // handleAccountChatSend handles an account chat send command
 func (s *server) handleAccountChatSend(a *account, parts []string) {
 	// account <id> chat send <chat> <msg>
@@ -231,7 +242,7 @@ func (s *server) handleAccountChat(a *account, parts []string) {
 	case "list":
 		s.handleAccountChatList(a)
 	case "join":
-		log.Println("chat join NYI")
+		s.handleAccountChatJoin(a, parts)
 	case "part":
 		log.Println("chat part NYI")
 	case "send":

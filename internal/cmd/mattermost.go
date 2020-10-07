@@ -36,6 +36,55 @@ func getErrorMessage(err *model.AppError) string {
 	return err.Message + " " + err.Id + " " + err.DetailedError
 }
 
+// createChannel creates a channel with name in team
+func (m *mattermost) createChannel(team *model.Team, name string) {
+	// create channel
+	c := &model.Channel{
+		DisplayName: name,
+		Name:        name,
+		Type:        model.CHANNEL_PRIVATE,
+		TeamId:      team.Id,
+	}
+	c, resp := m.client.CreateChannel(c)
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+	}
+}
+
+// joinChannel joins channel identified by "<team>/<channel>" string
+// in teamChannel
+func (m *mattermost) joinChannel(teamChannel string) {
+	// get team and channel name
+	tc := strings.Split(teamChannel, "/")
+	if len(tc) != 2 {
+		return
+	}
+	team := tc[0]
+	channel := tc[1]
+
+	// get team id
+	t, resp := m.client.GetTeamByName(team, "")
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+		return
+	}
+
+	// check if channel already exists
+	c, resp := m.client.GetChannelByName(channel, t.Id, "")
+	if resp.Error != nil {
+		// channel does not seem to exist, try to create it
+		m.createChannel(t, channel)
+		return
+	}
+
+	// channel exist, add current user to channel
+	_, resp = m.client.AddChannelMember(c.Id, m.user.Id)
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+		return
+	}
+}
+
 // getStatus returns our status
 func (m *mattermost) getStatus() string {
 	status, resp := m.client.GetUserStatus(m.user.Id, "")
