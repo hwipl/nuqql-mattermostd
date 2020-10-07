@@ -241,6 +241,19 @@ func (s *server) handleAccountChatUsers(a *account, parts []string) {
 	}
 }
 
+// handleAccountChatInvite handles an account chat invite command
+func (s *server) handleAccountChatInvite(a *account, parts []string) {
+	// account <id> chat invite <chat> <user>
+	if len(parts) < 6 {
+		return
+	}
+
+	channel := parts[4]
+	user := parts[5]
+	log.Println("adding " + user + " to channel " + channel)
+	a.client.addChannel(channel, user)
+}
+
 // handleAccountChat handles an account chat command
 func (s *server) handleAccountChat(a *account, parts []string) {
 	// chat commands have at least 4 parts
@@ -261,7 +274,7 @@ func (s *server) handleAccountChat(a *account, parts []string) {
 	case "users":
 		s.handleAccountChatUsers(a, parts)
 	case "invite":
-		log.Println("chat invite NYI")
+		s.handleAccountChatInvite(a, parts)
 	}
 }
 
