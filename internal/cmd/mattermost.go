@@ -101,6 +101,16 @@ func (m *mattermost) getChannel(teamID, name string) *model.Channel {
 	return c
 }
 
+// getUser tries to identify a user by name and returns it
+func (m *mattermost) getUser(name string) *model.User {
+	u, resp := m.client.GetUserByUsername(name, "")
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+		return nil
+	}
+	return u
+}
+
 // createChannel creates a channel with name in team
 func (m *mattermost) createChannel(team *model.Team, name string) {
 	// create channel
@@ -192,14 +202,14 @@ func (m *mattermost) addChannel(teamChannel, user string) {
 	}
 
 	// get user id
-	u, resp := m.client.GetUserByUsername(user, "")
-	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+	u := m.getUser(user)
+	if u == nil {
+		log.Println("could not get user:", user)
 		return
 	}
 
 	// add user to channel
-	_, resp = m.client.AddChannelMember(c.Id, u.Id)
+	_, resp := m.client.AddChannelMember(c.Id, u.Id)
 	if resp.Error != nil {
 		log.Println(getErrorMessage(resp.Error))
 		return
