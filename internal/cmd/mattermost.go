@@ -47,8 +47,25 @@ func (m *mattermost) splitTeamChannel(name string) (team, channel string) {
 	return
 }
 
-// getTeam tries to identify a team by name and returns it
+// getTeam tries to identify a team by name and returns it; if name is empty it
+// returns the first team the current user is in
 func (m *mattermost) getTeam(name string) *model.Team {
+	if name == "" {
+		// no team name given, try to get the first team the user is in
+		teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
+		if resp.Error != nil {
+			log.Println(getErrorMessage(resp.Error))
+			return nil
+		}
+
+		// return the first team if there are any teams
+		if len(teams) == 0 {
+			return nil
+		}
+		return teams[0]
+	}
+
+	// try to find team by name
 	t, resp := m.client.GetTeamByName(name, "")
 	if resp.Error != nil {
 		log.Println(getErrorMessage(resp.Error))
