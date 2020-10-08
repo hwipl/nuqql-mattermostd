@@ -39,11 +39,15 @@ func getErrorMessage(err *model.AppError) string {
 // splitTeamChannel splits a string that contains a team and a channel name
 func (m *mattermost) splitTeamChannel(name string) (team, channel string) {
 	tc := strings.Split(name, "/")
-	if len(tc) != 2 {
-		return
+	switch len(tc) {
+	case 1:
+		// assume name only contains the channel
+		channel = tc[0]
+	case 2:
+		// name contains team and channel
+		team = tc[0]
+		channel = tc[1]
 	}
-	team = tc[0]
-	channel = tc[1]
 	return
 }
 
