@@ -57,6 +57,16 @@ func (m *mattermost) getTeam(name string) *model.Team {
 	return t
 }
 
+// getChannel tries to identify a channel with teamid by name and returns it
+func (m *mattermost) getChannel(teamID, name string) *model.Channel {
+	c, resp := m.client.GetChannelByName(name, teamID, "")
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+		return nil
+	}
+	return c
+}
+
 // createChannel creates a channel with name in team
 func (m *mattermost) createChannel(team *model.Team, name string) {
 	// create channel
@@ -86,15 +96,15 @@ func (m *mattermost) joinChannel(teamChannel string) {
 	}
 
 	// check if channel already exists
-	c, resp := m.client.GetChannelByName(channel, t.Id, "")
-	if resp.Error != nil {
+	c := m.getChannel(t.Id, channel)
+	if c == nil {
 		// channel does not seem to exist, try to create it
 		m.createChannel(t, channel)
 		return
 	}
 
 	// channel exist, add current user to channel
-	_, resp = m.client.AddChannelMember(c.Id, m.user.Id)
+	_, resp := m.client.AddChannelMember(c.Id, m.user.Id)
 	if resp.Error != nil {
 		log.Println(getErrorMessage(resp.Error))
 		return
@@ -114,14 +124,14 @@ func (m *mattermost) partChannel(teamChannel string) {
 	}
 
 	// check if channel exists
-	c, resp := m.client.GetChannelByName(channel, t.Id, "")
-	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+	c := m.getChannel(t.Id, channel)
+	if c == nil {
+		log.Println("could not get channel:", channel, teamChannel)
 		return
 	}
 
 	// remove current user from channel
-	_, resp = m.client.RemoveUserFromChannel(c.Id, m.user.Id)
+	_, resp := m.client.RemoveUserFromChannel(c.Id, m.user.Id)
 	if resp.Error != nil {
 		log.Println(getErrorMessage(resp.Error))
 		return
@@ -141,9 +151,9 @@ func (m *mattermost) addChannel(teamChannel, user string) {
 	}
 
 	// check if channel exists
-	c, resp := m.client.GetChannelByName(channel, t.Id, "")
-	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+	c := m.getChannel(t.Id, channel)
+	if c == nil {
+		log.Println("could not get channel:", channel, teamChannel)
 		return
 	}
 
