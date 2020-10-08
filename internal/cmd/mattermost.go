@@ -47,6 +47,16 @@ func (m *mattermost) splitTeamChannel(name string) (team, channel string) {
 	return
 }
 
+// getTeam tries to identify a team by name and returns it
+func (m *mattermost) getTeam(name string) *model.Team {
+	t, resp := m.client.GetTeamByName(name, "")
+	if resp.Error != nil {
+		log.Println(getErrorMessage(resp.Error))
+		return nil
+	}
+	return t
+}
+
 // createChannel creates a channel with name in team
 func (m *mattermost) createChannel(team *model.Team, name string) {
 	// create channel
@@ -69,9 +79,9 @@ func (m *mattermost) joinChannel(teamChannel string) {
 	team, channel := m.splitTeamChannel(teamChannel)
 
 	// get team id
-	t, resp := m.client.GetTeamByName(team, "")
-	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+	t := m.getTeam(team)
+	if t == nil {
+		log.Println("could not get team:", team, teamChannel)
 		return
 	}
 
@@ -97,9 +107,9 @@ func (m *mattermost) partChannel(teamChannel string) {
 	team, channel := m.splitTeamChannel(teamChannel)
 
 	// get team id
-	t, resp := m.client.GetTeamByName(team, "")
-	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+	t := m.getTeam(team)
+	if t == nil {
+		log.Println("could not get team:", team, teamChannel)
 		return
 	}
 
@@ -124,9 +134,9 @@ func (m *mattermost) addChannel(teamChannel, user string) {
 	team, channel := m.splitTeamChannel(teamChannel)
 
 	// get team id
-	t, resp := m.client.GetTeamByName(team, "")
-	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+	t := m.getTeam(team)
+	if t == nil {
+		log.Println("could not get team:", team, teamChannel)
 		return
 	}
 
