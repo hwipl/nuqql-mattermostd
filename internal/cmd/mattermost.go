@@ -102,10 +102,15 @@ func (m *mattermost) getChannel(teamID, name string) *model.Channel {
 }
 
 // getUser tries to identify a user by name and returns it; name can be a user
-// ID or a username
+// ID, email address or a username
 func (m *mattermost) getUser(name string) *model.User {
 	// try to find user by id
 	if u, resp := m.client.GetUser(name, ""); resp.Error == nil {
+		return u
+	}
+
+	// try to find user by email
+	if u, resp := m.client.GetUserByEmail(name, ""); resp.Error == nil {
 		return u
 	}
 
