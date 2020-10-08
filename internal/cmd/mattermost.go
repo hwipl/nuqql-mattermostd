@@ -36,6 +36,17 @@ func getErrorMessage(err *model.AppError) string {
 	return err.Message + " " + err.Id + " " + err.DetailedError
 }
 
+// splitTeamChannel splits a string that contains a team and a channel name
+func (m *mattermost) splitTeamChannel(name string) (team, channel string) {
+	tc := strings.Split(name, "/")
+	if len(tc) != 2 {
+		return
+	}
+	team = tc[0]
+	channel = tc[1]
+	return
+}
+
 // createChannel creates a channel with name in team
 func (m *mattermost) createChannel(team *model.Team, name string) {
 	// create channel
@@ -55,12 +66,7 @@ func (m *mattermost) createChannel(team *model.Team, name string) {
 // in teamChannel
 func (m *mattermost) joinChannel(teamChannel string) {
 	// get team and channel name
-	tc := strings.Split(teamChannel, "/")
-	if len(tc) != 2 {
-		return
-	}
-	team := tc[0]
-	channel := tc[1]
+	team, channel := m.splitTeamChannel(teamChannel)
 
 	// get team id
 	t, resp := m.client.GetTeamByName(team, "")
@@ -88,12 +94,7 @@ func (m *mattermost) joinChannel(teamChannel string) {
 // partChannel leaves channel
 func (m *mattermost) partChannel(teamChannel string) {
 	// get team and channel name
-	tc := strings.Split(teamChannel, "/")
-	if len(tc) != 2 {
-		return
-	}
-	team := tc[0]
-	channel := tc[1]
+	team, channel := m.splitTeamChannel(teamChannel)
 
 	// get team id
 	t, resp := m.client.GetTeamByName(team, "")
@@ -120,12 +121,7 @@ func (m *mattermost) partChannel(teamChannel string) {
 // addChannel adds user to channel
 func (m *mattermost) addChannel(teamChannel, user string) {
 	// get team and channel name
-	tc := strings.Split(teamChannel, "/")
-	if len(tc) != 2 {
-		return
-	}
-	team := tc[0]
-	channel := tc[1]
+	team, channel := m.splitTeamChannel(teamChannel)
 
 	// get team id
 	t, resp := m.client.GetTeamByName(team, "")
