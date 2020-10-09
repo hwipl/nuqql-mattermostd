@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log"
 	"net"
+	"strings"
 )
 
 var (
@@ -92,7 +93,11 @@ func (q *queue) run() {
 
 			// add message to the history
 			if !q.noHistory {
-				q.history = append(q.history, m)
+				// only add "chat: msg:" or "message:" messages
+				if strings.HasPrefix(m, "chat: msg:") ||
+					strings.HasPrefix(m, "message:") {
+					q.history = append(q.history, m)
+				}
 			}
 
 			// send all queued messages to client if it's active
