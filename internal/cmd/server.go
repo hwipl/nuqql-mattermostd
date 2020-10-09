@@ -123,6 +123,11 @@ func (s *server) handleAccountBuddies(a *account) {
 	}
 }
 
+// handleAccountCollect handles an account collect command
+func (s *server) handleAccountCollect(a *account) {
+	clientQueue.getHistory()
+}
+
 // handleAccountSend handles an account send command
 func (s *server) handleAccountSend(a *account, parts []string) {
 	// account <id> send <user> <msg>
@@ -320,7 +325,7 @@ func (s *server) handleAccountCommand(parts []string) {
 	case "buddies":
 		s.handleAccountBuddies(a)
 	case "collect":
-		log.Println("collect", id, "NYI")
+		s.handleAccountCollect(a)
 	case "send":
 		s.handleAccountSend(a, parts)
 	case "status":
