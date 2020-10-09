@@ -127,7 +127,7 @@ func (q *queue) getHistory() {
 	q.histReqs <- struct{}{}
 }
 
-// queue sends msg to the (future) client via the queue
+// send sends msg to the (future) client via the queue
 func (q *queue) send(msg string) {
 	q.messages <- msg
 }
