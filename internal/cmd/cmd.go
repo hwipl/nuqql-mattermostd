@@ -53,7 +53,7 @@ func parseCommandLine() {
 
 	// handle disable history
 	if *disableHistory {
-		log.Println("disable history NYI")
+		clientQueue.noHistory = true
 	}
 
 	// handle disable filter own
