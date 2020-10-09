@@ -91,10 +91,9 @@ func (q *queue) run() {
 			q.queue = append(q.queue, m)
 
 			// add message to the history
-			if q.noHistory {
-				continue
+			if !q.noHistory {
+				q.history = append(q.history, m)
 			}
-			q.history = append(q.history, m)
 
 			// send all queued messages to client if it's active
 			if q.client == nil {
