@@ -5,6 +5,7 @@ import (
 	"html"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 )
@@ -433,11 +434,13 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 }
 
 // connect connects to a mattermost server
-func (m *mattermost) connect() {
+func (m *mattermost) connect() bool {
 	// login
+	log.Println("Connecting to mattermost server", m.server)
 	user, resp := m.client.Login(m.username, m.password)
 	if resp.Error != nil {
-		log.Fatal(getErrorMessage(resp.Error))
+		log.Println(getErrorMessage(resp.Error))
+		return false
 	}
 	log.Println("Logged in as user", user.Username)
 	m.user = user
@@ -446,10 +449,12 @@ func (m *mattermost) connect() {
 	websock, err := model.NewWebSocketClient4(webSocketPrefix+m.server,
 		m.client.AuthToken)
 	if err != nil {
-		log.Fatal(getErrorMessage(err))
+		log.Println(getErrorMessage(err))
+		return false
 	}
 	m.websock = websock
 	m.websock.Listen()
+	return true
 }
 
 // loop runs the main loop of the mattermost client handling websocket events
@@ -469,7 +474,14 @@ func (m *mattermost) loop() {
 
 // run starts the mattermost client
 func (m *mattermost) run() {
-	m.connect()
+	for !m.connect() {
+		select {
+		case <-time.After(15 * time.Second):
+			// wait before reconnecting
+		case <-m.done:
+			return
+		}
+	}
 	m.loop()
 }
 
