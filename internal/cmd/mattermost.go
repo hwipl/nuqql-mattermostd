@@ -387,6 +387,10 @@ func (m *mattermost) getPostFiles(post *model.Post) string {
 
 // handleWebSocketEvent handles events from the websocket
 func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
+	// check if event is valid
+	if event == nil {
+		return
+	}
 	log.Println("WebSocket Event:", event.EventType())
 
 	// only handle posted events
