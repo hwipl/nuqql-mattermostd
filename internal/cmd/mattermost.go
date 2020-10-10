@@ -434,8 +434,6 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 
 // connect connects to a mattermost server
 func (m *mattermost) connect() {
-	m.client = model.NewAPIv4Client(httpPrefix + m.server)
-
 	// login
 	user, resp := m.client.Login(m.username, m.password)
 	if resp.Error != nil {
@@ -487,6 +485,8 @@ func newClient(accountID int, server, username, password string) *mattermost {
 		server:    server,
 		username:  username,
 		password:  password,
+		client:    model.NewAPIv4Client(httpPrefix + server),
+		user:      &model.User{},
 		done:      make(chan bool, 1),
 	}
 	return &m
