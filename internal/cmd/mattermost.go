@@ -436,41 +436,13 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 func (m *mattermost) connect() {
 	m.client = model.NewAPIv4Client(httpPrefix + m.server)
 
-	// check if server is running
-	props, resp := m.client.GetOldClientConfig("")
-	if resp.Error != nil {
-		log.Fatal(getErrorMessage(resp.Error))
-	}
-	log.Println("Server is running version", props["Version"])
-
 	// login
-	m.user, resp = m.client.Login(m.username, m.password)
+	user, resp := m.client.Login(m.username, m.password)
 	if resp.Error != nil {
 		log.Fatal(getErrorMessage(resp.Error))
 	}
-	log.Println("Logged in as user", m.user.Username)
-
-	// get teams
-	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
-	if resp.Error != nil {
-		log.Fatal(getErrorMessage(resp.Error))
-	}
-	for _, t := range teams {
-		log.Println("User", m.user.Username, "is a member of team",
-			t.Name, "("+t.DisplayName+")")
-
-		// get channels
-		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
-			m.user.Id, false, "")
-		if resp.Error != nil {
-			log.Fatal(getErrorMessage(resp.Error))
-		}
-		for _, c := range channels {
-			log.Println("User", m.user.Username, "is in team",
-				t.Name+"'s channel", c.Name,
-				"("+c.DisplayName+")")
-		}
-	}
+	log.Println("Logged in as user", user.Username)
+	m.user = user
 
 	// create websocket and start listening for events
 	websock, err := model.NewWebSocketClient4(webSocketPrefix+m.server,
