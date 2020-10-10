@@ -450,9 +450,13 @@ func (m *mattermost) connect() {
 	if err != nil {
 		log.Fatal(getErrorMessage(err))
 	}
-	defer websock.Close()
 	m.websock = websock
 	m.websock.Listen()
+}
+
+// loop runs the main loop of the mattermost client handling websocket events
+func (m *mattermost) loop() {
+	defer m.websock.Close()
 
 	// handle websocket events
 	for {
@@ -468,6 +472,7 @@ func (m *mattermost) connect() {
 // run starts the mattermost client
 func (m *mattermost) run() {
 	m.connect()
+	m.loop()
 }
 
 // stop shuts down the mattermost client
