@@ -5,6 +5,7 @@ import (
 	"html"
 	"log"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -30,6 +31,8 @@ type mattermost struct {
 	user      *model.User
 	websock   *model.WebSocketClient
 	done      chan bool
+	mutex     sync.Mutex
+	online    bool
 }
 
 // getErrorMessage converts an AppError to a string
@@ -142,6 +145,10 @@ func (m *mattermost) createChannel(team *model.Team, name string) {
 // joinChannel joins channel identified by "<team>/<channel>" string
 // in teamChannel
 func (m *mattermost) joinChannel(teamChannel string) {
+	if !m.isOnline() {
+		return
+	}
+
 	// get team and channel name
 	team, channel := m.splitTeamChannel(teamChannel)
 
@@ -170,6 +177,10 @@ func (m *mattermost) joinChannel(teamChannel string) {
 
 // partChannel leaves channel
 func (m *mattermost) partChannel(teamChannel string) {
+	if !m.isOnline() {
+		return
+	}
+
 	// get team and channel name
 	team, channel := m.splitTeamChannel(teamChannel)
 
@@ -197,6 +208,10 @@ func (m *mattermost) partChannel(teamChannel string) {
 
 // addChannel adds user to channel
 func (m *mattermost) addChannel(teamChannel, user string) {
+	if !m.isOnline() {
+		return
+	}
+
 	// get team and channel name
 	team, channel := m.splitTeamChannel(teamChannel)
 
@@ -231,6 +246,10 @@ func (m *mattermost) addChannel(teamChannel, user string) {
 
 // getStatus returns our status
 func (m *mattermost) getStatus() string {
+	if !m.isOnline() {
+		return "offline"
+	}
+
 	status, resp := m.client.GetUserStatus(m.user.Id, "")
 	if resp.Error != nil {
 		log.Println(getErrorMessage(resp.Error))
@@ -241,6 +260,10 @@ func (m *mattermost) getStatus() string {
 
 // setStatus sets our status
 func (m *mattermost) setStatus(status string) {
+	if !m.isOnline() {
+		return
+	}
+
 	// check if status is valid:
 	// valid user status can be online, away, offline and dnd
 	switch status {
@@ -266,6 +289,10 @@ func (m *mattermost) setStatus(status string) {
 // getChannelUsers returns a list of users in channel
 func (m *mattermost) getChannelUsers(channel string) []*buddy {
 	var buddies []*buddy
+
+	if !m.isOnline() {
+		return buddies
+	}
 
 	// retrieve channel members
 	members, resp := m.client.GetChannelMembers(channel, 0, 60, "")
@@ -326,6 +353,10 @@ func (m *mattermost) getChannelName(c *model.Channel) string {
 func (m *mattermost) getBuddies() []*buddy {
 	var buddies []*buddy
 
+	if !m.isOnline() {
+		return buddies
+	}
+
 	// get teams
 	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
 	if resp.Error != nil {
@@ -355,6 +386,10 @@ func (m *mattermost) getBuddies() []*buddy {
 
 // sendMsg sends a message to channel
 func (m *mattermost) sendMsg(channel string, msg string) {
+	if !m.isOnline() {
+		return
+	}
+
 	post := &model.Post{
 		ChannelId: channel,
 		Message:   msg,
@@ -363,6 +398,20 @@ func (m *mattermost) sendMsg(channel string, msg string) {
 	if _, resp := m.client.CreatePost(post); resp.Error != nil {
 		log.Println(getErrorMessage(resp.Error))
 	}
+}
+
+// isOnline checks if the mattermost client is online
+func (m *mattermost) isOnline() bool {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.online
+}
+
+// setOnline sets the online state of the mattermost client
+func (m *mattermost) setOnline(online bool) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	m.online = online
 }
 
 // getPostFiles returns the files attached to post as a string
@@ -459,6 +508,7 @@ func (m *mattermost) connect() bool {
 	}
 	m.websock = websock
 	m.websock.Listen()
+	m.setOnline(true)
 	return true
 }
 
