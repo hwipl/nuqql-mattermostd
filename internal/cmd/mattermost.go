@@ -355,9 +355,10 @@ func (m *mattermost) getBuddies() []*buddy {
 
 // sendMsg sends a message to channel
 func (m *mattermost) sendMsg(channel string, msg string) {
-	post := &model.Post{}
-	post.ChannelId = channel
-	post.Message = msg
+	post := &model.Post{
+		ChannelId: channel,
+		Message:   msg,
+	}
 
 	if _, resp := m.client.CreatePost(post); resp.Error != nil {
 		log.Println(getErrorMessage(resp.Error))
