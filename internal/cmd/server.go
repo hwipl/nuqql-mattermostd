@@ -77,10 +77,16 @@ func (s *server) sendClient(msg string) {
 // handleAccountList handles an account list command
 func (s *server) handleAccountList() {
 	for _, a := range getAccounts() {
+		// get account status
+		status := "offline"
+		if a.client.isOnline() {
+			status = "online"
+		}
+
 		// send replies with the following format:
 		// account: <id> <name> <protocol> <user> <status>
 		r := fmt.Sprintf("account: %d %s %s %s %s\r\n", a.ID, "()",
-			a.Protocol, a.User, "online")
+			a.Protocol, a.User, status)
 		log.Println(r)
 		s.sendClient(r)
 	}
