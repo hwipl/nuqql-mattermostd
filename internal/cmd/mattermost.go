@@ -553,7 +553,6 @@ func newClient(accountID int, server, username, password string) *mattermost {
 		username:  username,
 		password:  password,
 		client:    model.NewAPIv4Client(httpPrefix + server),
-		user:      &model.User{},
 		done:      make(chan bool, 1),
 	}
 	return &m
