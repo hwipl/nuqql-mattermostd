@@ -89,6 +89,9 @@ func Run() {
 	// make sure working directory exists
 	initDirectory()
 
+	// start client queue
+	initClientQueue()
+
 	// start accounts and client connections
 	startAccounts()
 

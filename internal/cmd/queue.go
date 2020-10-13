@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	clientQueue = newQueue()
+	clientQueue *queue
 )
 
 // queue stores messages for the client
@@ -150,4 +150,9 @@ func newQueue() *queue {
 	}
 	go q.run()
 	return &q
+}
+
+// initClientQueue initializes the client queue
+func initClientQueue() {
+	clientQueue = newQueue()
 }
