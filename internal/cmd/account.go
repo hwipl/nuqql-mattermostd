@@ -3,7 +3,6 @@ package cmd
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -40,7 +39,7 @@ func (a *account) start() {
 	server := strings.Split(a.User, "@")[1]
 
 	// start client
-	log.Println("Starting account", a.ID)
+	logInfo("Starting account", a.ID)
 	a.client = newClient(a.ID, server, user, a.Password)
 	go a.client.run()
 }
@@ -48,7 +47,7 @@ func (a *account) start() {
 // stop shuts down the client for this account
 func (a *account) stop() {
 	if a.client != nil {
-		log.Println("Stopping account", a.ID)
+		logInfo("Stopping account", a.ID)
 		a.client.stop()
 	}
 }
@@ -120,7 +119,7 @@ func readAccountsFromFile() {
 	// open file for reading
 	f, err := os.Open(file)
 	if err != nil {
-		log.Println(err)
+		logError(err)
 		return
 	}
 
@@ -133,7 +132,7 @@ func readAccountsFromFile() {
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
+			logFatal(err)
 		}
 
 		accounts[a.ID] = &a
@@ -147,13 +146,13 @@ func writeAccountsToFile() {
 	// open file for writing
 	f, err := os.Create(file)
 	if err != nil {
-		log.Fatal(err)
+		logFatal(err)
 	}
 
 	// make sure file is only readable and writable by the current user
 	err = os.Chmod(file, 0600)
 	if err != nil {
-		log.Fatal(err)
+		logFatal(err)
 	}
 
 	// write accounts to file
@@ -161,7 +160,7 @@ func writeAccountsToFile() {
 	for _, a := range accounts {
 		err := enc.Encode(&a)
 		if err != nil {
-			log.Fatal(err)
+			logFatal(err)
 		}
 	}
 }
