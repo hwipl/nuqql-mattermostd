@@ -7,6 +7,10 @@ import (
 	"os"
 )
 
+const (
+	backendVersion = "0.0.0-devel"
+)
+
 // parseCommandLine parses the command line arguments
 func parseCommandLine() {
 	// configure command line arguments
@@ -35,7 +39,7 @@ func parseCommandLine() {
 
 	// handle version command line argument
 	if *version {
-		fmt.Println("0.0dev")
+		fmt.Println(backendVersion)
 		os.Exit(0)
 	}
 
