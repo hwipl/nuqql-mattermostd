@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bufio"
-	"log"
 	"net"
 	"strings"
 )
@@ -32,13 +31,13 @@ func (q *queue) sendToClient() {
 		if n < len(msg) || err != nil {
 			q.client.Close()
 			q.client = nil
-			log.Println(err)
+			logError(err)
 			break
 		}
 		if err := w.Flush(); err != nil {
 			q.client.Close()
 			q.client = nil
-			log.Println(err)
+			logError(err)
 			break
 		}
 		q.queue = q.queue[1:]
@@ -53,13 +52,13 @@ func (q *queue) sendHistoryToClient() {
 		if n < len(msg) || err != nil {
 			q.client.Close()
 			q.client = nil
-			log.Println(err)
+			logError(err)
 			break
 		}
 		if err := w.Flush(); err != nil {
 			q.client.Close()
 			q.client = nil
-			log.Println(err)
+			logError(err)
 			break
 		}
 	}
