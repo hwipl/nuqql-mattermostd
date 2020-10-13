@@ -51,7 +51,6 @@ func parseCommandLine() {
 
 	// handle log level
 	if *loglevel != "" {
-		log.Println("loglevel NYI")
 		conf.loglevel = *loglevel
 	}
 
@@ -89,6 +88,9 @@ func Run() {
 	// make sure working directory exists
 	initDirectory()
 
+	// initialize logging
+	initLogging()
+
 	// start client queue
 	initClientQueue()
 
@@ -100,4 +102,7 @@ func Run() {
 
 	// stop all accounts and client connections
 	stopAccounts()
+
+	// stop logging
+	stopLogging()
 }
