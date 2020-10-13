@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"html"
-	"log"
 	"net"
 	"net/url"
 	"os"
@@ -89,7 +88,7 @@ func (s *server) handleAccountList() {
 		// account: <id> <name> <protocol> <user> <status>
 		r := fmt.Sprintf("account: %d %s %s %s %s\r\n", a.ID, "()",
 			a.Protocol, a.User, status)
-		log.Println(r)
+		logDebug(r)
 		s.sendClient(r)
 	}
 }
@@ -105,7 +104,7 @@ func (s *server) handleAccountAdd(parts []string) {
 	user := parts[3]
 	password := parts[4]
 	id := addAccount(protocol, user, password)
-	log.Println("added new account with id:", id)
+	logInfo("added new account with id:", id)
 
 	// optional reply:
 	// info: new account added.
@@ -115,7 +114,7 @@ func (s *server) handleAccountAdd(parts []string) {
 // handleAccountDelete handles an account delete command
 func (s *server) handleAccountDelete(id int) {
 	if delAccount(id) {
-		log.Println("deleted account with id: ", id)
+		logInfo("deleted account with id: ", id)
 		s.sendClient(fmt.Sprintf("info: account %d deleted.\r\n", id))
 	}
 
@@ -144,7 +143,7 @@ func (s *server) handleAccountSend(a *account, parts []string) {
 	}
 	channel := parts[3]
 	msg := strings.Join(parts[4:], " ")
-	log.Println("sending message to channel "+channel+":", msg)
+	logDebug("sending message to channel "+channel+":", msg)
 	a.client.sendMsg(channel, html.UnescapeString(msg))
 }
 
@@ -208,7 +207,7 @@ func (s *server) handleAccountChatJoin(a *account, parts []string) {
 		return
 	}
 	channel := parts[4]
-	log.Println("joining channel " + channel)
+	logInfo("joining channel " + channel)
 	a.client.joinChannel(channel)
 }
 
@@ -219,7 +218,7 @@ func (s *server) handleAccountChatPart(a *account, parts []string) {
 		return
 	}
 	channel := parts[4]
-	log.Println("leaving channel " + channel)
+	logInfo("leaving channel " + channel)
 	a.client.partChannel(channel)
 }
 
@@ -231,7 +230,7 @@ func (s *server) handleAccountChatSend(a *account, parts []string) {
 	}
 	channel := parts[4]
 	msg := strings.Join(parts[5:], " ")
-	log.Println("sending message to channel "+channel+":", msg)
+	logDebug("sending message to channel "+channel+":", msg)
 	a.client.sendMsg(channel, html.UnescapeString(msg))
 }
 
@@ -263,7 +262,7 @@ func (s *server) handleAccountChatInvite(a *account, parts []string) {
 
 	channel := parts[4]
 	user := parts[5]
-	log.Println("adding " + user + " to channel " + channel)
+	logInfo("adding " + user + " to channel " + channel)
 	a.client.addChannel(channel, user)
 }
 
@@ -352,7 +351,7 @@ func (s *server) handleVersionCommand() {
 
 // handleCommand handles a command received from the client
 func (s *server) handleCommand(cmd string) {
-	log.Println("client:", cmd)
+	logDebug("client:", cmd)
 
 	parts := strings.Split(cmd, " ")
 	switch parts[0] {
@@ -373,7 +372,7 @@ func (s *server) handleCommand(cmd string) {
 // handleClient handles a single client connection
 func (s *server) handleClient() {
 	defer s.conn.Close()
-	log.Println("New client connection", s.conn.RemoteAddr())
+	logInfo("New client connection", s.conn.RemoteAddr())
 
 	// configure client in queue
 	clientQueue.setClient(s.conn)
@@ -394,7 +393,7 @@ func (s *server) handleClient() {
 		// read a cmd line from the client
 		cmd, err := r.ReadString('\n')
 		if err != nil {
-			log.Println("client:", err)
+			logError("client:", err)
 			return
 		}
 
@@ -412,25 +411,25 @@ func (s *server) run() {
 	if s.network == "unix" {
 		// remove old socket file
 		if err := os.Remove(s.address); err != nil {
-			log.Println(err)
+			logError(err)
 		}
 	}
 
 	// start listener
 	l, err := net.Listen(s.network, s.address)
 	if err != nil {
-		log.Fatal(err)
+		logFatal(err)
 	}
 	defer l.Close()
 	s.listener = l
 	s.serverActive = true
 
 	// handle client connections
-	log.Println("Server waiting for client connection")
+	logInfo("Server waiting for client connection")
 	for s.serverActive {
 		conn, err := s.listener.Accept()
 		if err != nil {
-			log.Println(err)
+			logError(err)
 			continue
 		}
 		s.conn = conn
