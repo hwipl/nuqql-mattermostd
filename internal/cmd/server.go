@@ -49,6 +49,8 @@ account <id> chat users <chat>
 account <id> chat invite <chat> <user>
     invite the user <user> to the group chat <chat> on the account with the
     account id <id>.
+version
+    get version of the backend
 bye
     disconnect from backend
 quit
@@ -341,6 +343,13 @@ func (s *server) handleAccountCommand(parts []string) {
 	}
 }
 
+// handleVersionCommand handles a version command received from the client
+func (s *server) handleVersionCommand() {
+	versionFmt := "info: version: %s v%s\r\n"
+	msg := fmt.Sprintf(versionFmt, conf.name, backendVersion)
+	s.sendClient(msg)
+}
+
 // handleCommand handles a command received from the client
 func (s *server) handleCommand(cmd string) {
 	log.Println("client:", cmd)
@@ -349,6 +358,8 @@ func (s *server) handleCommand(cmd string) {
 	switch parts[0] {
 	case "account":
 		s.handleAccountCommand(parts)
+	case "version":
+		s.handleVersionCommand()
 	case "bye":
 		s.clientActive = false
 	case "quit":
