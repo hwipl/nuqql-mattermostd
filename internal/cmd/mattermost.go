@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"html"
-	"log"
 	"strings"
 	"sync"
 	"time"
@@ -63,7 +62,7 @@ func (m *mattermost) getTeam(name string) *model.Team {
 		// no team name given, try to get the first team the user is in
 		teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
 		if resp.Error != nil {
-			log.Println(getErrorMessage(resp.Error))
+			logError(getErrorMessage(resp.Error))
 			return nil
 		}
 
@@ -82,7 +81,7 @@ func (m *mattermost) getTeam(name string) *model.Team {
 	// try to find team by name
 	t, resp := m.client.GetTeamByName(name, "")
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 		return nil
 	}
 	return t
@@ -99,7 +98,7 @@ func (m *mattermost) getChannel(teamID, name string) *model.Channel {
 	// try to find channel by name
 	c, resp := m.client.GetChannelByName(name, teamID, "")
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 		return nil
 	}
 	return c
@@ -121,7 +120,7 @@ func (m *mattermost) getUser(name string) *model.User {
 	// try to find user by name
 	u, resp := m.client.GetUserByUsername(name, "")
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 		return nil
 	}
 	return u
@@ -138,7 +137,7 @@ func (m *mattermost) createChannel(team *model.Team, name string) {
 	}
 	c, resp := m.client.CreateChannel(c)
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 	}
 }
 
@@ -155,7 +154,7 @@ func (m *mattermost) joinChannel(teamChannel string) {
 	// get team id
 	t := m.getTeam(team)
 	if t == nil {
-		log.Println("could not get team:", team, teamChannel)
+		logError("could not get team:", team, teamChannel)
 		return
 	}
 
@@ -170,7 +169,7 @@ func (m *mattermost) joinChannel(teamChannel string) {
 	// channel exist, add current user to channel
 	_, resp := m.client.AddChannelMember(c.Id, m.user.Id)
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 		return
 	}
 }
@@ -187,21 +186,21 @@ func (m *mattermost) partChannel(teamChannel string) {
 	// get team id
 	t := m.getTeam(team)
 	if t == nil {
-		log.Println("could not get team:", team, teamChannel)
+		logError("could not get team:", team, teamChannel)
 		return
 	}
 
 	// check if channel exists
 	c := m.getChannel(t.Id, channel)
 	if c == nil {
-		log.Println("could not get channel:", channel, teamChannel)
+		logError("could not get channel:", channel, teamChannel)
 		return
 	}
 
 	// remove current user from channel
 	_, resp := m.client.RemoveUserFromChannel(c.Id, m.user.Id)
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 		return
 	}
 }
@@ -218,28 +217,28 @@ func (m *mattermost) addChannel(teamChannel, user string) {
 	// get team id
 	t := m.getTeam(team)
 	if t == nil {
-		log.Println("could not get team:", team, teamChannel)
+		logError("could not get team:", team, teamChannel)
 		return
 	}
 
 	// check if channel exists
 	c := m.getChannel(t.Id, channel)
 	if c == nil {
-		log.Println("could not get channel:", channel, teamChannel)
+		logError("could not get channel:", channel, teamChannel)
 		return
 	}
 
 	// get user id
 	u := m.getUser(user)
 	if u == nil {
-		log.Println("could not get user:", user)
+		logError("could not get user:", user)
 		return
 	}
 
 	// add user to channel
 	_, resp := m.client.AddChannelMember(c.Id, u.Id)
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 		return
 	}
 }
@@ -252,7 +251,7 @@ func (m *mattermost) getStatus() string {
 
 	status, resp := m.client.GetUserStatus(m.user.Id, "")
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 		return ""
 	}
 	return status.Status
@@ -282,7 +281,7 @@ func (m *mattermost) setStatus(status string) {
 	}
 	_, resp := m.client.UpdateUserStatus(m.user.Id, &s)
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 	}
 }
 
@@ -297,7 +296,7 @@ func (m *mattermost) getChannelUsers(channel string) []*buddy {
 	// retrieve channel members
 	members, resp := m.client.GetChannelMembers(channel, 0, 60, "")
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 		return nil
 	}
 
@@ -306,13 +305,13 @@ func (m *mattermost) getChannelUsers(channel string) []*buddy {
 		// user name
 		user, resp := m.client.GetUser(member.UserId, "")
 		if resp.Error != nil {
-			log.Println(getErrorMessage(resp.Error))
+			logError(getErrorMessage(resp.Error))
 			return nil
 		}
 		// user status
 		status, resp := m.client.GetUserStatus(user.Id, "")
 		if resp.Error != nil {
-			log.Println(getErrorMessage(resp.Error))
+			logError(getErrorMessage(resp.Error))
 			return nil
 		}
 
@@ -339,7 +338,7 @@ func (m *mattermost) getChannelName(c *model.Channel) string {
 		user, resp := m.client.GetUser(other, "")
 		if resp.Error != nil {
 			// cannot retrieve username, fallback to id
-			log.Println(getErrorMessage(resp.Error))
+			logError(getErrorMessage(resp.Error))
 			return other
 		}
 		return user.Username
@@ -360,7 +359,7 @@ func (m *mattermost) getBuddies() []*buddy {
 	// get teams
 	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 		return nil
 	}
 	for _, t := range teams {
@@ -368,7 +367,7 @@ func (m *mattermost) getBuddies() []*buddy {
 		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
 			m.user.Id, false, "")
 		if resp.Error != nil {
-			log.Println(getErrorMessage(resp.Error))
+			logError(getErrorMessage(resp.Error))
 			return nil
 		}
 		for _, c := range channels {
@@ -396,7 +395,7 @@ func (m *mattermost) sendMsg(channel string, msg string) {
 	}
 
 	if _, resp := m.client.CreatePost(post); resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 	}
 }
 
@@ -441,7 +440,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	if event == nil {
 		return
 	}
-	log.Println("WebSocket Event:", event.EventType())
+	logDebug("WebSocket Event:", event.EventType())
 
 	// only handle posted events
 	if event.EventType() != model.WEBSOCKET_EVENT_POSTED {
@@ -465,14 +464,14 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 			}
 			text += fileInfo
 		}
-		log.Println("Message:", post.CreateAt, post.ChannelId,
+		logDebug("Message:", post.CreateAt, post.ChannelId,
 			post.UserId, text)
 
 		// get name of user who sent this message
 		username := post.UserId
 		user, resp := m.client.GetUser(post.UserId, "")
 		if resp.Error != nil {
-			log.Println(getErrorMessage(resp.Error))
+			logError(getErrorMessage(resp.Error))
 		} else {
 			username = user.Username
 		}
@@ -490,20 +489,20 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 // connect connects to a mattermost server
 func (m *mattermost) connect() bool {
 	// login
-	log.Println("Connecting to mattermost server", m.server)
+	logInfo("Connecting to mattermost server", m.server)
 	user, resp := m.client.Login(m.username, m.password)
 	if resp.Error != nil {
-		log.Println(getErrorMessage(resp.Error))
+		logError(getErrorMessage(resp.Error))
 		return false
 	}
-	log.Println("Logged in as user", user.Username)
+	logInfo("Logged in as user", user.Username)
 	m.user = user
 
 	// create websocket and start listening for events
 	websock, err := model.NewWebSocketClient4(webSocketPrefix+m.server,
 		m.client.AuthToken)
 	if err != nil {
-		log.Println(getErrorMessage(err))
+		logError(getErrorMessage(err))
 		return false
 	}
 	m.websock = websock
