@@ -108,6 +108,9 @@ func (m *mattermost) getTeam(name string) *model.Team {
 
 // getChannelByID tries to get a channel by its ID
 func (m *mattermost) getChannelByID(id string) *model.Channel {
+	if !model.IsValidId(id) {
+		return nil
+	}
 	c, resp := m.client.GetChannel(id, "")
 	if resp.Error != nil {
 		return nil
