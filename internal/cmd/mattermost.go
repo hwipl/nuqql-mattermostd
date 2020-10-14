@@ -151,6 +151,15 @@ func (m *mattermost) getUserByID(id string) *model.User {
 	return u
 }
 
+// getUserByEmail tries to get a user by its email address
+func (m *mattermost) getUserByEmail(email string) *model.User {
+	u, resp := m.client.GetUserByEmail(email, "")
+	if resp.Error != nil {
+		return nil
+	}
+	return u
+}
+
 // getUser tries to identify a user by name and returns it; name can be a user
 // ID, email address or a username
 func (m *mattermost) getUser(name string) *model.User {
@@ -160,7 +169,7 @@ func (m *mattermost) getUser(name string) *model.User {
 	}
 
 	// try to find user by email
-	if u, resp := m.client.GetUserByEmail(name, ""); resp.Error == nil {
+	if u := m.getUserByEmail(name); u != nil {
 		return u
 	}
 
