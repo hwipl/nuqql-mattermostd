@@ -63,6 +63,15 @@ func (m *mattermost) getTeamByID(id string) *model.Team {
 	return t
 }
 
+// getTeamByName tries to get a team by its name
+func (m *mattermost) getTeamByName(name string) *model.Team {
+	t, resp := m.client.GetTeamByName(name, "")
+	if resp.Error != nil {
+		return nil
+	}
+	return t
+}
+
 // getTeam tries to identify a team by name and returns it; name can be a team
 // ID or a team name; if name is empty it returns the first team the current
 // user is in
@@ -88,12 +97,7 @@ func (m *mattermost) getTeam(name string) *model.Team {
 	}
 
 	// try to find team by name
-	t, resp := m.client.GetTeamByName(name, "")
-	if resp.Error != nil {
-		logError(getErrorMessage(resp.Error))
-		return nil
-	}
-	return t
+	return m.getTeamByName(name)
 }
 
 // getChannel tries to identify a channel with teamid by name and returns it;
