@@ -115,6 +115,15 @@ func (m *mattermost) getChannelByID(id string) *model.Channel {
 	return c
 }
 
+// getChannelByName tries to get a channel by its team ID and name
+func (m *mattermost) getChannelByName(teamID, name string) *model.Channel {
+	c, resp := m.client.GetChannelByName(name, teamID, "")
+	if resp.Error != nil {
+		return nil
+	}
+	return c
+}
+
 // getChannel tries to identify a channel with teamid by name and returns it;
 // name can be a channel ID or a channel name
 func (m *mattermost) getChannel(teamID, name string) *model.Channel {
@@ -124,12 +133,7 @@ func (m *mattermost) getChannel(teamID, name string) *model.Channel {
 	}
 
 	// try to find channel by name
-	c, resp := m.client.GetChannelByName(name, teamID, "")
-	if resp.Error != nil {
-		logError(getErrorMessage(resp.Error))
-		return nil
-	}
-	return c
+	return m.getChannelByName(teamID, name)
 }
 
 // getUser tries to identify a user by name and returns it; name can be a user
