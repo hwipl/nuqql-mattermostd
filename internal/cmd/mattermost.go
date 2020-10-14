@@ -56,6 +56,9 @@ func (m *mattermost) splitTeamChannel(name string) (team, channel string) {
 
 // getTeamByID tries to get a team by its ID
 func (m *mattermost) getTeamByID(id string) *model.Team {
+	if !model.IsValidId(id) {
+		return nil
+	}
 	t, resp := m.client.GetTeam(id, "")
 	if resp.Error != nil {
 		return nil
