@@ -68,6 +68,9 @@ func (m *mattermost) getTeamByID(id string) *model.Team {
 
 // getTeamByName tries to get a team by its name
 func (m *mattermost) getTeamByName(name string) *model.Team {
+	if !model.IsValidTeamName(name) {
+		return nil
+	}
 	t, resp := m.client.GetTeamByName(name, "")
 	if resp.Error != nil {
 		return nil
