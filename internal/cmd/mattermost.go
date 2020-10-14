@@ -160,6 +160,15 @@ func (m *mattermost) getUserByEmail(email string) *model.User {
 	return u
 }
 
+// getUserByUsername tries to get a user by its username
+func (m *mattermost) getUserByUsername(username string) *model.User {
+	u, resp := m.client.GetUserByUsername(username, "")
+	if resp.Error != nil {
+		return nil
+	}
+	return u
+}
+
 // getUser tries to identify a user by name and returns it; name can be a user
 // ID, email address or a username
 func (m *mattermost) getUser(name string) *model.User {
@@ -174,12 +183,7 @@ func (m *mattermost) getUser(name string) *model.User {
 	}
 
 	// try to find user by name
-	u, resp := m.client.GetUserByUsername(name, "")
-	if resp.Error != nil {
-		logError(getErrorMessage(resp.Error))
-		return nil
-	}
-	return u
+	return m.getUserByUsername(name)
 }
 
 // createChannel creates a channel with name in team
