@@ -156,6 +156,9 @@ func (m *mattermost) getUserByID(id string) *model.User {
 
 // getUserByEmail tries to get a user by its email address
 func (m *mattermost) getUserByEmail(email string) *model.User {
+	if !model.IsValidEmail(email) {
+		return nil
+	}
 	u, resp := m.client.GetUserByEmail(email, "")
 	if resp.Error != nil {
 		return nil
