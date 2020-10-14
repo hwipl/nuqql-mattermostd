@@ -54,6 +54,15 @@ func (m *mattermost) splitTeamChannel(name string) (team, channel string) {
 	return
 }
 
+// getTeamByID tries to get a team by its ID
+func (m *mattermost) getTeamByID(id string) *model.Team {
+	t, resp := m.client.GetTeam(id, "")
+	if resp.Error != nil {
+		return nil
+	}
+	return t
+}
+
 // getTeam tries to identify a team by name and returns it; name can be a team
 // ID or a team name; if name is empty it returns the first team the current
 // user is in
@@ -74,7 +83,7 @@ func (m *mattermost) getTeam(name string) *model.Team {
 	}
 
 	// try to find team by id
-	if t, resp := m.client.GetTeam(name, ""); resp.Error == nil {
+	if t := m.getTeamByID(name); t != nil {
 		return t
 	}
 
