@@ -144,6 +144,9 @@ func (m *mattermost) getChannel(teamID, name string) *model.Channel {
 
 // getUserByID tries to get a user by its ID
 func (m *mattermost) getUserByID(id string) *model.User {
+	if !model.IsValidId(id) {
+		return nil
+	}
 	u, resp := m.client.GetUser(id, "")
 	if resp.Error != nil {
 		return nil
