@@ -71,7 +71,7 @@ func newConfig(name string) *config {
 		address:  "localhost",
 		port:     32000,
 		sockfile: name + ".sock",
-		loglevel: "debug",
+		loglevel: "warn",
 	}
 	return &c
 }
