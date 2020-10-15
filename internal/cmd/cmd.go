@@ -23,7 +23,7 @@ func parseCommandLine() {
 	flag.StringVar(&conf.sockfile, "sockfile", conf.sockfile,
 		"set AF_UNIX socket `file` in working directory")
 	flag.StringVar(&conf.dir, "dir", conf.dir, "set working `directory`")
-	loglevel := flag.String("loglevel", "",
+	loglevel := flag.String("loglevel", conf.loglevel,
 		"set logging `level`: debug, info, warn, error")
 	disableHistory := flag.Bool("disable-history", false,
 		"disable message history")
