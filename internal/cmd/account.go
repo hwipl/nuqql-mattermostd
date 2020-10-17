@@ -27,6 +27,13 @@ type account struct {
 	client *mattermost
 }
 
+// splitAccountUser extracts username and server address from the account user
+func (a *account) splitAccountUser() (username, server string) {
+	username = strings.Split(a.User, "@")[0]
+	server = strings.Split(a.User, "@")[1]
+	return
+}
+
 // start starts the client for this account
 func (a *account) start() {
 	// skip non-mattermost accounts
@@ -35,8 +42,7 @@ func (a *account) start() {
 	}
 
 	// extract server and username from account user
-	user := strings.Split(a.User, "@")[0]
-	server := strings.Split(a.User, "@")[1]
+	user, server := a.splitAccountUser()
 
 	// start client
 	logInfo("Starting account", a.ID)
