@@ -25,6 +25,12 @@ func TestSplitAccountUser(t *testing.T) {
 	}
 }
 
+func TestAccountStart(t *testing.T) {
+	// test dummy account
+	a := account{}
+	a.start()
+}
+
 func TestGetFreeAccountID(t *testing.T) {
 	accounts = make(map[int]*account)
 	defer func() {
