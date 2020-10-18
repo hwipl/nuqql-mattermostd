@@ -197,3 +197,29 @@ func TestAddAccount(t *testing.T) {
 		t.Errorf("got %s, wanted %s", a.Password, password)
 	}
 }
+
+func TestDelAccount(t *testing.T) {
+	// reset accounts
+	accounts = make(map[int]*account)
+	defer func() {
+		// cleanup
+		accounts = make(map[int]*account)
+	}()
+
+	// configure working directory
+	dir := createTestWorkDir()
+	defer removeTestWorkDir(dir)
+	conf.dir = dir
+
+	// add dummy account
+	id := addAccount("test", "testuser", "testpasswd")
+
+	// test deleting dummy account
+	delAccount(id)
+
+	var want *account = nil
+	got := getAccount(id)
+	if got != want {
+		t.Errorf("got %p, wanted %p", got, want)
+	}
+}
