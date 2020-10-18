@@ -31,6 +31,12 @@ func TestAccountStart(t *testing.T) {
 	a.start()
 }
 
+func TestAccountStop(t *testing.T) {
+	// test dummy account
+	a := account{}
+	a.stop()
+}
+
 func TestGetFreeAccountID(t *testing.T) {
 	accounts = make(map[int]*account)
 	defer func() {
