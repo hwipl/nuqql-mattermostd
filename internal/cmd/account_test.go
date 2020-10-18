@@ -270,3 +270,29 @@ func TestReadAccountsFromFile(t *testing.T) {
 		t.Errorf("got %s, wanted %s", a.Password, password)
 	}
 }
+
+func TestStartStopAccounts(t *testing.T) {
+	// reset accounts
+	accounts = make(map[int]*account)
+	defer func() {
+		// cleanup
+		accounts = make(map[int]*account)
+	}()
+
+	// configure working directory
+	dir := createTestWorkDir()
+	defer removeTestWorkDir(dir)
+	conf.dir = dir
+
+	// add dummy accounts
+	addAccount("test", "testuser1", "testpasswd1")
+	addAccount("test", "testuser2", "testpasswd2")
+	addAccount("test", "testuser3", "testpasswd3")
+
+	// reset accounts
+	accounts = make(map[int]*account)
+
+	// test starting and stopping dummy accounts
+	startAccounts()
+	stopAccounts()
+}
