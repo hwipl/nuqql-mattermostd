@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -74,6 +75,26 @@ func TestGetAccount(t *testing.T) {
 	got = getAccount(3)
 	if got != want {
 		t.Errorf("got %p, wanted %p", got, want)
+	}
+}
+
+func TestGetAccounts(t *testing.T) {
+	accounts = make(map[int]*account)
+	defer func() {
+		// cleanup
+		accounts = make(map[int]*account)
+	}()
+
+	// add entries to accounts
+	accounts[0] = &account{ID: 0}
+	accounts[1] = &account{ID: 1}
+	accounts[2] = &account{ID: 2}
+
+	want := []*account{accounts[0], accounts[1], accounts[2]}
+	got := getAccounts()
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v, wanted %v", got, want)
 	}
 }
 
