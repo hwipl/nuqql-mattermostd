@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"io/ioutil"
+	"log"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -139,5 +142,58 @@ func TestGetFreeAccountID(t *testing.T) {
 	got = getFreeAccountID()
 	if got != want {
 		t.Errorf("got %d, wanted %d", got, want)
+	}
+}
+
+func createTestWorkDir() string {
+	dir, err := ioutil.TempDir("", "nuqql-mattermostd-test")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return dir
+}
+
+func removeTestWorkDir(dir string) {
+	os.RemoveAll(dir)
+}
+
+func TestAddAccount(t *testing.T) {
+	// reset accounts
+	accounts = make(map[int]*account)
+	defer func() {
+		// cleanup
+		accounts = make(map[int]*account)
+	}()
+
+	// configure working directory
+	dir := createTestWorkDir()
+	defer removeTestWorkDir(dir)
+	conf.dir = dir
+
+	// add dummy account
+	protocol := "test"
+	user := "testuser"
+	password := "testpasswd"
+	id := addAccount(protocol, user, password)
+	a := getAccount(id)
+
+	// test id
+	if a.ID != id {
+		t.Errorf("got %d, wanted %d", a.ID, id)
+	}
+
+	// test protocol
+	if a.Protocol != protocol {
+		t.Errorf("got %s, wanted %s", a.Protocol, protocol)
+	}
+
+	// test user
+	if a.User != user {
+		t.Errorf("got %s, wanted %s", a.User, user)
+	}
+
+	// test password
+	if a.Password != password {
+		t.Errorf("got %s, wanted %s", a.Password, password)
 	}
 }
