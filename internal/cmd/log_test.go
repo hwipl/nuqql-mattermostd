@@ -107,3 +107,19 @@ func TestLogWarn(t *testing.T) {
 		t.Errorf("got %s, wanted %s", got, want)
 	}
 }
+
+func TestLogError(t *testing.T) {
+	// set temporary log file
+	setTestLogFile()
+	defer unsetTestLogFile()
+
+	// test logging with approriate level
+	test := "this is a test message"
+	loggingLevel = loggingLevelError
+	logError(test)
+	want := "ERROR: " + test + "\n"
+	got := readTestLogFile()
+	if got != want {
+		t.Errorf("got %s, wanted %s", got, want)
+	}
+}
