@@ -7,6 +7,26 @@ import (
 	"testing"
 )
 
+func TestGetListenNetwork(t *testing.T) {
+	c := newConfig("testConfig")
+
+	// test unix
+	want := "unix"
+	c.af = want
+	got := c.getListenNetwork()
+	if got != want {
+		t.Errorf("got %s, wanted %s", got, want)
+	}
+
+	// test inet
+	c.af = "inet"
+	want = "tcp"
+	got = c.getListenNetwork()
+	if got != want {
+		t.Errorf("got %s, wanted %s", got, want)
+	}
+}
+
 func TestNewConfig(t *testing.T) {
 	name := "testConfig"
 	confDir, err := os.UserConfigDir()
