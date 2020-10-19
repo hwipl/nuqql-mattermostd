@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -22,6 +23,26 @@ func TestGetListenNetwork(t *testing.T) {
 	c.af = "inet"
 	want = "tcp"
 	got = c.getListenNetwork()
+	if got != want {
+		t.Errorf("got %s, wanted %s", got, want)
+	}
+}
+
+func TestGetListenAddress(t *testing.T) {
+	c := newConfig("testConfig")
+
+	// test unix
+	c.af = "unix"
+	want := filepath.Join(c.dir, c.sockfile)
+	got := c.getListenAddress()
+	if got != want {
+		t.Errorf("got %s, wanted %s", got, want)
+	}
+
+	// test inet
+	c.af = "inet"
+	want = fmt.Sprintf("%s:%d", c.address, c.port)
+	got = c.getListenAddress()
 	if got != want {
 		t.Errorf("got %s, wanted %s", got, want)
 	}
