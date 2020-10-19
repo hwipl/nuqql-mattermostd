@@ -7,16 +7,23 @@ import (
 	"testing"
 )
 
-func getLogTestFile() *os.File {
+func setTestLogFile() {
 	f, err := ioutil.TempFile("", "testlogfile*")
 	if err != nil {
 		log.Fatal(err)
 	}
-	return f
+	loggingFile = f
+	log.SetOutput(loggingFile)
 }
 
-func readLogTestFile(name string) string {
-	data, err := ioutil.ReadFile(name)
+func unsetTestLogFile() {
+	log.SetOutput(os.Stderr)
+	loggingFile.Close()
+	os.Remove(loggingFile.Name())
+}
+
+func readTestLogFile() string {
+	data, err := ioutil.ReadFile(loggingFile.Name())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,18 +32,15 @@ func readLogTestFile(name string) string {
 
 func TestLogDebug(t *testing.T) {
 	// set temporary log file
-	loggingFile = getLogTestFile()
-	defer os.Remove(loggingFile.Name())
-	defer loggingFile.Close()
-	log.SetOutput(loggingFile)
-	defer log.SetOutput(os.Stderr)
+	setTestLogFile()
+	defer unsetTestLogFile()
 
 	// test logging with approriate level
 	test := "this is a test message"
 	loggingLevel = loggingLevelNone
 	logDebug(test)
 	want := "DEBUG: " + test + "\n"
-	got := readLogTestFile(loggingFile.Name())
+	got := readTestLogFile()
 	if got != want {
 		t.Errorf("got %s, wanted %s", got, want)
 	}
@@ -46,7 +50,7 @@ func TestLogDebug(t *testing.T) {
 	loggingLevel = loggingLevelError
 	logDebug(test)
 	want = "DEBUG: " + test + "\n"
-	got = readLogTestFile(loggingFile.Name())
+	got = readTestLogFile()
 	if got != want {
 		t.Errorf("got %s, wanted %s", got, want)
 	}
