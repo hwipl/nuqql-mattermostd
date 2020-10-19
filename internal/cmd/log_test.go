@@ -81,3 +81,29 @@ func TestLogInfo(t *testing.T) {
 		t.Errorf("got %s, wanted %s", got, want)
 	}
 }
+
+func TestLogWarn(t *testing.T) {
+	// set temporary log file
+	setTestLogFile()
+	defer unsetTestLogFile()
+
+	// test logging with approriate level
+	test := "this is a test message"
+	loggingLevel = loggingLevelNone
+	logWarn(test)
+	want := "WARN: " + test + "\n"
+	got := readTestLogFile()
+	if got != want {
+		t.Errorf("got %s, wanted %s", got, want)
+	}
+
+	// test logging with level too low
+	// logfile should only contain last log message
+	loggingLevel = loggingLevelError
+	logWarn(test)
+	want = "WARN: " + test + "\n"
+	got = readTestLogFile()
+	if got != want {
+		t.Errorf("got %s, wanted %s", got, want)
+	}
+}
