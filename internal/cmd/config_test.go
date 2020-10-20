@@ -60,6 +60,7 @@ func TestNewConfig(t *testing.T) {
 	port := uint16(32000)
 	sockfile := name + ".sock"
 	loglevel := "warn"
+	disableHistory := false
 	pushAccounts := false
 
 	c := newConfig(name)
@@ -83,6 +84,9 @@ func TestNewConfig(t *testing.T) {
 	}
 	if c.loglevel != loglevel {
 		t.Errorf("got %s, wanted %s", c.loglevel, loglevel)
+	}
+	if c.disableHistory != disableHistory {
+		t.Errorf("got %t, wanted %t", c.disableHistory, disableHistory)
 	}
 	if c.pushAccounts != pushAccounts {
 		t.Errorf("got %t, wanted %t", c.pushAccounts, pushAccounts)
