@@ -11,9 +11,6 @@ import (
 )
 
 var (
-	// filterOwn toggles filtering of own messages
-	filterOwn = true
-
 	// httpPrefix is prepended to the server to form a http url
 	httpPrefix = "https://"
 	// webSocketPrefix is prepended to the server to form a websocket url
@@ -32,6 +29,9 @@ type mattermost struct {
 	done      chan bool
 	mutex     sync.Mutex
 	online    bool
+
+	// filterOwn toggles filtering of own messages
+	filterOwn bool
 }
 
 // getErrorMessage converts an AppError to a string
@@ -521,7 +521,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		event.GetData()["post"].(string)))
 	if post != nil {
 		// filter own messages
-		if post.UserId == m.user.Id && filterOwn {
+		if post.UserId == m.user.Id && m.filterOwn {
 			return
 		}
 
@@ -615,6 +615,9 @@ func (m *mattermost) stop() {
 
 // newClient creates a new mattermost client
 func newClient(accountID int, server, username, password string) *mattermost {
+	// configure filtering of own messages
+	filterOwn := true
+
 	m := mattermost{
 		accountID: accountID,
 		server:    server,
@@ -622,6 +625,8 @@ func newClient(accountID int, server, username, password string) *mattermost {
 		password:  password,
 		client:    model.NewAPIv4Client(httpPrefix + server),
 		done:      make(chan bool, 1),
+
+		filterOwn:       filterOwn,
 	}
 	return &m
 }
