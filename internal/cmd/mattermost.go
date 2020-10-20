@@ -11,8 +11,6 @@ import (
 )
 
 var (
-	// httpPrefix is prepended to the server to form a http url
-	httpPrefix = "https://"
 	// webSocketPrefix is prepended to the server to form a websocket url
 	webSocketPrefix = "wss://"
 )
@@ -32,6 +30,9 @@ type mattermost struct {
 
 	// filterOwn toggles filtering of own messages
 	filterOwn bool
+
+	// httpPrefix is prepended to the server to form a http url
+	httpPrefix string
 }
 
 // getErrorMessage converts an AppError to a string
@@ -618,6 +619,9 @@ func newClient(accountID int, server, username, password string) *mattermost {
 	// configure filtering of own messages
 	filterOwn := true
 
+	// configure encryption
+	httpPrefix := "https://"
+
 	m := mattermost{
 		accountID: accountID,
 		server:    server,
@@ -627,6 +631,7 @@ func newClient(accountID int, server, username, password string) *mattermost {
 		done:      make(chan bool, 1),
 
 		filterOwn:       filterOwn,
+		httpPrefix:      httpPrefix,
 	}
 	return &m
 }
