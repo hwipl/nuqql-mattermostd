@@ -25,8 +25,8 @@ func parseCommandLine() {
 	flag.StringVar(&conf.dir, "dir", conf.dir, "set working `directory`")
 	loglevel := flag.String("loglevel", conf.loglevel,
 		"set logging `level`: debug, info, warn, error")
-	disableHistory := flag.Bool("disable-history", false,
-		"disable message history")
+	flag.BoolVar(&conf.disableHistory, "disable-history",
+		conf.disableHistory, "disable message history")
 	flag.BoolVar(&conf.pushAccounts, "push-accounts", conf.pushAccounts,
 		"push accounts to client")
 	disableFilterOwn := flag.Bool("disable-filterown", false,
@@ -52,11 +52,6 @@ func parseCommandLine() {
 	// handle log level
 	if *loglevel != "" {
 		conf.loglevel = *loglevel
-	}
-
-	// handle disable history
-	if *disableHistory {
-		clientQueue.noHistory = true
 	}
 
 	// handle disable filter own

@@ -28,6 +28,8 @@ type config struct {
 	sockfile string
 	// loglevel is the logging level: debug, info, warn, error
 	loglevel string
+	// disableHistory disables the message history
+	disableHistory bool
 	// pushAccounts toggles pushing accounts to the client on connect
 	pushAccounts bool
 }

@@ -141,11 +141,12 @@ func (q *queue) setClient(conn net.Conn) {
 }
 
 // newQueue creates a new queue
-func newQueue() *queue {
+func newQueue(noHistory bool) *queue {
 	q := queue{
-		clients:  make(chan net.Conn),
-		messages: make(chan string),
-		histReqs: make(chan struct{}),
+		clients:   make(chan net.Conn),
+		messages:  make(chan string),
+		histReqs:  make(chan struct{}),
+		noHistory: noHistory,
 	}
 	go q.run()
 	return &q
@@ -153,5 +154,5 @@ func newQueue() *queue {
 
 // initClientQueue initializes the client queue
 func initClientQueue() {
-	clientQueue = newQueue()
+	clientQueue = newQueue(conf.disableHistory)
 }
