@@ -29,10 +29,10 @@ func parseCommandLine() {
 		conf.disableHistory, "disable message history")
 	flag.BoolVar(&conf.pushAccounts, "push-accounts", conf.pushAccounts,
 		"push accounts to client")
-	disableEncryption := flag.Bool("disable-encryption", false,
-		"disable TLS encryption")
 	flag.BoolVar(&conf.disableFilterOwn, "disable-filterown",
 		conf.disableFilterOwn, "disable filtering of own messages")
+	flag.BoolVar(&conf.disableEncryption, "disable-encryption",
+		conf.disableEncryption, "disable TLS encryption")
 
 	// parse command line arguments
 	flag.Parse()
@@ -52,12 +52,6 @@ func parseCommandLine() {
 	// handle log level
 	if *loglevel != "" {
 		conf.loglevel = *loglevel
-	}
-
-	// handle disable encryption
-	if *disableEncryption {
-		httpPrefix = "http://"
-		webSocketPrefix = "ws://"
 	}
 }
 

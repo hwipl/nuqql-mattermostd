@@ -63,6 +63,7 @@ func TestNewConfig(t *testing.T) {
 	disableHistory := false
 	pushAccounts := false
 	disableFilterOwn := false
+	disableEncryption := false
 
 	c := newConfig(name)
 	if c.name != name {
@@ -95,5 +96,9 @@ func TestNewConfig(t *testing.T) {
 	if c.disableFilterOwn != disableFilterOwn {
 		t.Errorf("got %t, wanted %t", c.disableFilterOwn,
 			disableFilterOwn)
+	}
+	if c.disableEncryption != disableEncryption {
+		t.Errorf("got %t, wanted %t", c.disableEncryption,
+			disableEncryption)
 	}
 }

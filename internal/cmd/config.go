@@ -34,6 +34,8 @@ type config struct {
 	pushAccounts bool
 	// disableFilterOwn disables filtering of own messages
 	disableFilterOwn bool
+	// disableEncryption disables TLS encryption
+	disableEncryption bool
 }
 
 // getListenNetwork returns the listen network string based on the configured
