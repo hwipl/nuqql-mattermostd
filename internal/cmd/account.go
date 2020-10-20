@@ -46,7 +46,7 @@ func (a *account) start() {
 
 	// start client
 	logInfo("Starting account", a.ID)
-	a.client = newClient(a.ID, server, user, a.Password)
+	a.client = newClient(conf, a.ID, server, user, a.Password)
 	go a.client.run()
 }
 
