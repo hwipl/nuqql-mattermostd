@@ -10,11 +10,6 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
-var (
-	// webSocketPrefix is prepended to the server to form a websocket url
-	webSocketPrefix = "wss://"
-)
-
 // mattermost stores mattermost client information
 type mattermost struct {
 	accountID int
@@ -33,6 +28,9 @@ type mattermost struct {
 
 	// httpPrefix is prepended to the server to form a http url
 	httpPrefix string
+
+	// webSocketPrefix is prepended to the server to form a websocket url
+	webSocketPrefix string
 }
 
 // getErrorMessage converts an AppError to a string
@@ -569,7 +567,7 @@ func (m *mattermost) connect() bool {
 	m.user = user
 
 	// create websocket and start listening for events
-	websock, err := model.NewWebSocketClient4(webSocketPrefix+m.server,
+	websock, err := model.NewWebSocketClient4(m.webSocketPrefix+m.server,
 		m.client.AuthToken)
 	if err != nil {
 		logError(getErrorMessage(err))
@@ -621,6 +619,7 @@ func newClient(accountID int, server, username, password string) *mattermost {
 
 	// configure encryption
 	httpPrefix := "https://"
+	webSocketPrefix := "wss://"
 
 	m := mattermost{
 		accountID: accountID,
@@ -632,6 +631,7 @@ func newClient(accountID int, server, username, password string) *mattermost {
 
 		filterOwn:       filterOwn,
 		httpPrefix:      httpPrefix,
+		webSocketPrefix: webSocketPrefix,
 	}
 	return &m
 }
