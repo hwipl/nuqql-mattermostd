@@ -32,6 +32,8 @@ type config struct {
 	disableHistory bool
 	// pushAccounts toggles pushing accounts to the client on connect
 	pushAccounts bool
+	// disableFilterOwn disables filtering of own messages
+	disableFilterOwn bool
 }
 
 // getListenNetwork returns the listen network string based on the configured

@@ -62,6 +62,7 @@ func TestNewConfig(t *testing.T) {
 	loglevel := "warn"
 	disableHistory := false
 	pushAccounts := false
+	disableFilterOwn := false
 
 	c := newConfig(name)
 	if c.name != name {
@@ -90,5 +91,9 @@ func TestNewConfig(t *testing.T) {
 	}
 	if c.pushAccounts != pushAccounts {
 		t.Errorf("got %t, wanted %t", c.pushAccounts, pushAccounts)
+	}
+	if c.disableFilterOwn != disableFilterOwn {
+		t.Errorf("got %t, wanted %t", c.disableFilterOwn,
+			disableFilterOwn)
 	}
 }
