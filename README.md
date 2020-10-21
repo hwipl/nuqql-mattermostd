@@ -74,5 +74,5 @@ Usage of ./nuqql-mattermostd:
 
 ## Changes
 
-* devel:
+* v0.1.0:
   * First/initial release.

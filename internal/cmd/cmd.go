@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	backendVersion = "0.0.0-devel"
+	backendVersion = "0.1.0"
 )
 
 // parseCommandLine parses the command line arguments
