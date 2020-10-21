@@ -71,3 +71,8 @@ Usage of ./nuqql-mattermostd:
         "nuqql-mattermostd.sock")
   -v    show version and exit
 ```
+
+## Changes
+
+* devel:
+  * First/initial release.
