@@ -15,24 +15,24 @@ const (
 func parseCommandLine() {
 	// configure command line arguments
 	version := flag.Bool("v", false, "show version and exit")
-	flag.StringVar(&conf.af, "af", conf.af, "set socket address "+
+	flag.StringVar(&conf.AF, "af", conf.AF, "set socket address "+
 		"`family`: \"inet\" for AF_INET, \"unix\" for AF_UNIX")
-	flag.StringVar(&conf.address, "address", conf.address,
+	flag.StringVar(&conf.Address, "address", conf.Address,
 		"set AF_INET listen `address`")
-	port := flag.Uint("port", uint(conf.port), "set AF_INET listen `port`")
-	flag.StringVar(&conf.sockfile, "sockfile", conf.sockfile,
+	port := flag.Uint("port", uint(conf.Port), "set AF_INET listen `port`")
+	flag.StringVar(&conf.Sockfile, "sockfile", conf.Sockfile,
 		"set AF_UNIX socket `file` in working directory")
-	flag.StringVar(&conf.dir, "dir", conf.dir, "set working `directory`")
-	loglevel := flag.String("loglevel", conf.loglevel,
+	flag.StringVar(&conf.Dir, "dir", conf.Dir, "set working `directory`")
+	loglevel := flag.String("loglevel", conf.Loglevel,
 		"set logging `level`: debug, info, warn, error")
-	flag.BoolVar(&conf.disableHistory, "disable-history",
-		conf.disableHistory, "disable message history")
-	flag.BoolVar(&conf.pushAccounts, "push-accounts", conf.pushAccounts,
+	flag.BoolVar(&conf.DisableHistory, "disable-history",
+		conf.DisableHistory, "disable message history")
+	flag.BoolVar(&conf.PushAccounts, "push-accounts", conf.PushAccounts,
 		"push accounts to client")
-	flag.BoolVar(&conf.disableFilterOwn, "disable-filterown",
-		conf.disableFilterOwn, "disable filtering of own messages")
-	flag.BoolVar(&conf.disableEncryption, "disable-encryption",
-		conf.disableEncryption, "disable TLS encryption")
+	flag.BoolVar(&conf.DisableFilterOwn, "disable-filterown",
+		conf.DisableFilterOwn, "disable filtering of own messages")
+	flag.BoolVar(&conf.DisableEncryption, "disable-encryption",
+		conf.DisableEncryption, "disable TLS encryption")
 
 	// parse command line arguments
 	flag.Parse()
@@ -47,17 +47,17 @@ func parseCommandLine() {
 	if *port > 65535 {
 		log.Fatal("error parsing port ", *port)
 	}
-	conf.port = uint16(*port)
+	conf.Port = uint16(*port)
 
 	// handle log level
 	if *loglevel != "" {
-		conf.loglevel = *loglevel
+		conf.Loglevel = *loglevel
 	}
 }
 
 // initDirectory makes sure the working directory exists
 func initDirectory() {
-	err := os.MkdirAll(conf.dir, 0700)
+	err := os.MkdirAll(conf.Dir, 0700)
 	if err != nil {
 		log.Fatal(err)
 	}

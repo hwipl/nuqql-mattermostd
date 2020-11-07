@@ -8,40 +8,40 @@ import (
 )
 
 var (
-	conf = newConfig("nuqql-mattermostd")
+	conf = NewConfig("nuqql-mattermostd")
 )
 
-// config stores the configuration
-type config struct {
-	// name is the name of this configuration, e.g., "nuqql-mattermostd"
-	name string
-	// dir is the working directory
-	dir string
-	// af is the address family of the server socket:
+// Config stores the configuration
+type Config struct {
+	// Name is the Name of this configuration, e.g., "nuqql-mattermostd"
+	Name string
+	// Dir is the working directory
+	Dir string
+	// AF is the address family of the server socket:
 	// inet (for AF_INET) or unix (for AF_UNIX)
-	af string
-	// address is the AF_INET listen address
-	address string
-	// port is the AF_INET listen port
-	port uint16
-	// sockfile is the AF_UNIX socket file in the working directory
-	sockfile string
-	// loglevel is the logging level: debug, info, warn, error
-	loglevel string
-	// disableHistory disables the message history
-	disableHistory bool
-	// pushAccounts toggles pushing accounts to the client on connect
-	pushAccounts bool
-	// disableFilterOwn disables filtering of own messages
-	disableFilterOwn bool
-	// disableEncryption disables TLS encryption
-	disableEncryption bool
+	AF string
+	// Address is the AF_INET listen Address
+	Address string
+	// Port is the AF_INET listen Port
+	Port uint16
+	// Sockfile is the AF_UNIX socket file in the working directory
+	Sockfile string
+	// Loglevel is the logging level: debug, info, warn, error
+	Loglevel string
+	// DisableHistory disables the message history
+	DisableHistory bool
+	// PushAccounts toggles pushing accounts to the client on connect
+	PushAccounts bool
+	// DisableFilterOwn disables filtering of own messages
+	DisableFilterOwn bool
+	// DisableEncryption disables TLS encryption
+	DisableEncryption bool
 }
 
-// getListenNetwork returns the listen network string based on the configured
+// GetListenNetwork returns the listen network string based on the configured
 // address family
-func (c *config) getListenNetwork() string {
-	if c.af == "unix" {
+func (c *Config) GetListenNetwork() string {
+	if c.AF == "unix" {
 		return "unix"
 	}
 
@@ -49,19 +49,19 @@ func (c *config) getListenNetwork() string {
 	return "tcp"
 }
 
-// getListenAddress returns the listen address string based on the configured
+// GetListenAddress returns the listen address string based on the configured
 // address family
-func (c *config) getListenAddress() string {
-	if c.af == "unix" {
-		return filepath.Join(c.dir, c.sockfile)
+func (c *Config) GetListenAddress() string {
+	if c.AF == "unix" {
+		return filepath.Join(c.Dir, c.Sockfile)
 	}
 
 	// treat everything else as inet
-	return fmt.Sprintf("%s:%d", c.address, c.port)
+	return fmt.Sprintf("%s:%d", c.Address, c.Port)
 }
 
-// newConfig creates a new configuration identified by the program name
-func newConfig(name string) *config {
+// NewConfig creates a new configuration identified by the program name
+func NewConfig(name string) *Config {
 	// construct default directory
 	confDir, err := os.UserConfigDir()
 	if err != nil {
@@ -70,14 +70,14 @@ func newConfig(name string) *config {
 	dir := filepath.Join(confDir, name)
 
 	// create and return config
-	c := config{
-		name:     name,
-		dir:      dir,
-		af:       "inet",
-		address:  "localhost",
-		port:     32000,
-		sockfile: name + ".sock",
-		loglevel: "warn",
+	c := Config{
+		Name:     name,
+		Dir:      dir,
+		AF:       "inet",
+		Address:  "localhost",
+		Port:     32000,
+		Sockfile: name + ".sock",
+		Loglevel: "warn",
 	}
 	return &c
 }

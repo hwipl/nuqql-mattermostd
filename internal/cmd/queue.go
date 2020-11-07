@@ -154,5 +154,5 @@ func newQueue(noHistory bool) *queue {
 
 // initClientQueue initializes the client queue
 func initClientQueue() {
-	clientQueue = newQueue(conf.disableHistory)
+	clientQueue = newQueue(conf.DisableHistory)
 }

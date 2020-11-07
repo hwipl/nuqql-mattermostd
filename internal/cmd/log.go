@@ -80,10 +80,10 @@ func stopLogging() {
 // initLogging initializes logging to the log file
 func initLogging() {
 	// set loglevel from config
-	loggingLevel = getLogLevel(conf.loglevel)
+	loggingLevel = getLogLevel(conf.Loglevel)
 
 	// create/open log file
-	file := filepath.Join(conf.dir, conf.name+".log")
+	file := filepath.Join(conf.Dir, conf.Name+".log")
 	f, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Fatal(err)

@@ -9,40 +9,40 @@ import (
 )
 
 func TestGetListenNetwork(t *testing.T) {
-	c := newConfig("testConfig")
+	c := NewConfig("testConfig")
 
 	// test unix
 	want := "unix"
-	c.af = want
-	got := c.getListenNetwork()
+	c.AF = want
+	got := c.GetListenNetwork()
 	if got != want {
 		t.Errorf("got %s, wanted %s", got, want)
 	}
 
 	// test inet
-	c.af = "inet"
+	c.AF = "inet"
 	want = "tcp"
-	got = c.getListenNetwork()
+	got = c.GetListenNetwork()
 	if got != want {
 		t.Errorf("got %s, wanted %s", got, want)
 	}
 }
 
 func TestGetListenAddress(t *testing.T) {
-	c := newConfig("testConfig")
+	c := NewConfig("testConfig")
 
 	// test unix
-	c.af = "unix"
-	want := filepath.Join(c.dir, c.sockfile)
-	got := c.getListenAddress()
+	c.AF = "unix"
+	want := filepath.Join(c.Dir, c.Sockfile)
+	got := c.GetListenAddress()
 	if got != want {
 		t.Errorf("got %s, wanted %s", got, want)
 	}
 
 	// test inet
-	c.af = "inet"
-	want = fmt.Sprintf("%s:%d", c.address, c.port)
-	got = c.getListenAddress()
+	c.AF = "inet"
+	want = fmt.Sprintf("%s:%d", c.Address, c.Port)
+	got = c.GetListenAddress()
 	if got != want {
 		t.Errorf("got %s, wanted %s", got, want)
 	}
@@ -65,40 +65,40 @@ func TestNewConfig(t *testing.T) {
 	disableFilterOwn := false
 	disableEncryption := false
 
-	c := newConfig(name)
-	if c.name != name {
-		t.Errorf("got %s, wanted %s", c.name, name)
+	c := NewConfig(name)
+	if c.Name != name {
+		t.Errorf("got %s, wanted %s", c.Name, name)
 	}
-	if c.dir != dir {
-		t.Errorf("got %s, wanted %s", c.dir, dir)
+	if c.Dir != dir {
+		t.Errorf("got %s, wanted %s", c.Dir, dir)
 	}
-	if c.af != af {
-		t.Errorf("got %s, wanted %s", c.af, af)
+	if c.AF != af {
+		t.Errorf("got %s, wanted %s", c.AF, af)
 	}
-	if c.address != address {
-		t.Errorf("got %s, wanted %s", c.address, address)
+	if c.Address != address {
+		t.Errorf("got %s, wanted %s", c.Address, address)
 	}
-	if c.port != port {
-		t.Errorf("got %d, wanted %d", c.port, port)
+	if c.Port != port {
+		t.Errorf("got %d, wanted %d", c.Port, port)
 	}
-	if c.sockfile != sockfile {
-		t.Errorf("got %s, wanted %s", c.sockfile, sockfile)
+	if c.Sockfile != sockfile {
+		t.Errorf("got %s, wanted %s", c.Sockfile, sockfile)
 	}
-	if c.loglevel != loglevel {
-		t.Errorf("got %s, wanted %s", c.loglevel, loglevel)
+	if c.Loglevel != loglevel {
+		t.Errorf("got %s, wanted %s", c.Loglevel, loglevel)
 	}
-	if c.disableHistory != disableHistory {
-		t.Errorf("got %t, wanted %t", c.disableHistory, disableHistory)
+	if c.DisableHistory != disableHistory {
+		t.Errorf("got %t, wanted %t", c.DisableHistory, disableHistory)
 	}
-	if c.pushAccounts != pushAccounts {
-		t.Errorf("got %t, wanted %t", c.pushAccounts, pushAccounts)
+	if c.PushAccounts != pushAccounts {
+		t.Errorf("got %t, wanted %t", c.PushAccounts, pushAccounts)
 	}
-	if c.disableFilterOwn != disableFilterOwn {
-		t.Errorf("got %t, wanted %t", c.disableFilterOwn,
+	if c.DisableFilterOwn != disableFilterOwn {
+		t.Errorf("got %t, wanted %t", c.DisableFilterOwn,
 			disableFilterOwn)
 	}
-	if c.disableEncryption != disableEncryption {
-		t.Errorf("got %t, wanted %t", c.disableEncryption,
+	if c.DisableEncryption != disableEncryption {
+		t.Errorf("got %t, wanted %t", c.DisableEncryption,
 			disableEncryption)
 	}
 }

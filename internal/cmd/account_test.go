@@ -168,7 +168,7 @@ func TestAddAccount(t *testing.T) {
 	// configure working directory
 	dir := createTestWorkDir()
 	defer removeTestWorkDir(dir)
-	conf.dir = dir
+	conf.Dir = dir
 
 	// add dummy account
 	protocol := "test"
@@ -209,7 +209,7 @@ func TestDelAccount(t *testing.T) {
 	// configure working directory
 	dir := createTestWorkDir()
 	defer removeTestWorkDir(dir)
-	conf.dir = dir
+	conf.Dir = dir
 
 	// add dummy account
 	id := addAccount("test", "testuser", "testpasswd")
@@ -235,7 +235,7 @@ func TestReadAccountsFromFile(t *testing.T) {
 	// configure working directory
 	dir := createTestWorkDir()
 	defer removeTestWorkDir(dir)
-	conf.dir = dir
+	conf.Dir = dir
 
 	// add dummy account
 	protocol := "test"
@@ -282,7 +282,7 @@ func TestStartStopAccounts(t *testing.T) {
 	// configure working directory
 	dir := createTestWorkDir()
 	defer removeTestWorkDir(dir)
-	conf.dir = dir
+	conf.Dir = dir
 
 	// add dummy accounts
 	addAccount("test", "testuser1", "testpasswd1")

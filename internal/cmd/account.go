@@ -120,7 +120,7 @@ func delAccount(id int) bool {
 
 // readAccountsFromFile reads accounts from file
 func readAccountsFromFile() {
-	file := filepath.Join(conf.dir, accountsFile)
+	file := filepath.Join(conf.Dir, accountsFile)
 
 	// open file for reading
 	f, err := os.Open(file)
@@ -147,7 +147,7 @@ func readAccountsFromFile() {
 
 // writeAccountsToFile writes all accounts to file
 func writeAccountsToFile() {
-	file := filepath.Join(conf.dir, accountsFile)
+	file := filepath.Join(conf.Dir, accountsFile)
 
 	// open file for writing
 	f, err := os.Create(file)

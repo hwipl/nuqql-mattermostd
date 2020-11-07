@@ -345,7 +345,7 @@ func (s *server) handleAccountCommand(parts []string) {
 // handleVersionCommand handles a version command received from the client
 func (s *server) handleVersionCommand() {
 	versionFmt := "info: version: %s v%s\r\n"
-	msg := fmt.Sprintf(versionFmt, conf.name, backendVersion)
+	msg := fmt.Sprintf(versionFmt, conf.Name, backendVersion)
 	s.sendClient(msg)
 }
 
@@ -382,7 +382,7 @@ func (s *server) handleClient() {
 	s.clientActive = true
 
 	// if push accounts is enabled, send list of accounts to client
-	if conf.pushAccounts {
+	if conf.PushAccounts {
 		s.handleAccountList()
 	}
 
@@ -442,8 +442,8 @@ func (s *server) run() {
 // runServer runs the server that handles nuqql/telnet connections
 func runServer() {
 	server := server{
-		network: conf.getListenNetwork(),
-		address: conf.getListenAddress(),
+		network: conf.GetListenNetwork(),
+		address: conf.GetListenAddress(),
 	}
 	server.run()
 }

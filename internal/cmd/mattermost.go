@@ -613,19 +613,19 @@ func (m *mattermost) stop() {
 }
 
 // newClient creates a new mattermost client
-func newClient(config *config, accountID int, server, username,
+func newClient(config *Config, accountID int, server, username,
 	password string) *mattermost {
 
 	// configure filtering of own messages
 	filterOwn := true
-	if config.disableFilterOwn {
+	if config.DisableFilterOwn {
 		filterOwn = false
 	}
 
 	// configure encryption
 	httpPrefix := "https://"
 	webSocketPrefix := "wss://"
-	if config.disableEncryption {
+	if config.DisableEncryption {
 		httpPrefix = "http://"
 		webSocketPrefix = "ws://"
 	}
