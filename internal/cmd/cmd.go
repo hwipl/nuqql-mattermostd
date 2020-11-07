@@ -11,6 +11,18 @@ const (
 	backendVersion = "0.1.0"
 )
 
+// readConfigFile reads the configuration from the config file
+func readConfigFile() {
+	// read working directory from command line arguments if present
+	dirFlags := flag.NewFlagSet("", flag.ContinueOnError)
+	dirFlags.StringVar(&conf.Dir, "dir", conf.Dir, "")
+	dirFlags.Usage = func() {}
+	dirFlags.Parse(os.Args[1:])
+
+	// working directory is set now; read the config from the config file
+	conf.ReadFromFile()
+}
+
 // parseCommandLine parses the command line arguments
 func parseCommandLine() {
 	// configure command line arguments
@@ -22,6 +34,7 @@ func parseCommandLine() {
 	port := flag.Uint("port", uint(conf.Port), "set AF_INET listen `port`")
 	flag.StringVar(&conf.Sockfile, "sockfile", conf.Sockfile,
 		"set AF_UNIX socket `file` in working directory")
+	// note: the argument "dir" is also parsed in readConfigFile()
 	flag.StringVar(&conf.Dir, "dir", conf.Dir, "set working `directory`")
 	loglevel := flag.String("loglevel", conf.Loglevel,
 		"set logging `level`: debug, info, warn, error")
@@ -66,6 +79,9 @@ func initDirectory() {
 
 // Run is the main entry point
 func Run() {
+	// read config from config file
+	readConfigFile()
+
 	// parse command line arguments
 	parseCommandLine()
 
