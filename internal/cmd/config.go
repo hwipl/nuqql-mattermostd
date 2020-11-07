@@ -1,14 +1,20 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 )
 
 var (
+	// conf is the global configuration
 	conf = NewConfig("nuqql-mattermostd")
+
+	// configFile is the json file that contains the config
+	configFile = "config.json"
 )
 
 // Config stores the configuration
@@ -58,6 +64,30 @@ func (c *Config) GetListenAddress() string {
 
 	// treat everything else as inet
 	return fmt.Sprintf("%s:%d", c.Address, c.Port)
+}
+
+// ReadFromFile reads the config from the configuration file "config.json" in
+// the working directory
+func (c *Config) ReadFromFile() {
+	file := filepath.Join(c.Dir, configFile)
+
+	// open file for reading
+	f, err := os.Open(file)
+	if err != nil {
+		return
+	}
+
+	// read config from file
+	dec := json.NewDecoder(f)
+	for {
+		err := dec.Decode(c)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }
 
 // NewConfig creates a new configuration identified by the program name
