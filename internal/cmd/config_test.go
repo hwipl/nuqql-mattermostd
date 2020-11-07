@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -45,6 +46,96 @@ func TestGetListenAddress(t *testing.T) {
 	got = c.GetListenAddress()
 	if got != want {
 		t.Errorf("got %s, wanted %s", got, want)
+	}
+}
+
+func writeTestConfigFile(dir, content string) {
+	// create new config file
+	file := filepath.Join(dir, configFile)
+	log.Println(file)
+	f, err := os.Create(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	// write content to config file
+	_, err = f.WriteString(content)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func TestReadFromFile(t *testing.T) {
+	c := NewConfig("testConfig")
+	dir := createTestWorkDir()
+	defer removeTestWorkDir(dir)
+	c.Dir = dir
+
+	// test with no config file
+	want := c
+	got := NewConfig("testConfig")
+	got.Dir = dir
+	got.ReadFromFile()
+
+	if *got != *want {
+		t.Errorf("got %v, wanted %v", got, want)
+	}
+
+	// test with empty config file
+	writeTestConfigFile(dir, "")
+
+	want = c
+	got = NewConfig("testConfig")
+	got.Dir = dir
+	got.ReadFromFile()
+
+	if *got != *want {
+		t.Errorf("got %v, wanted %v", got, want)
+	}
+
+	// test with partial config file
+	content := `{
+		"loglevel": "debug"
+	}`
+	writeTestConfigFile(dir, content)
+
+	want = c
+	want.Loglevel = "debug"
+
+	got = NewConfig("testConfig")
+	got.Dir = dir
+	got.ReadFromFile()
+
+	if *got != *want {
+		t.Errorf("got %v, wanted %v", got, want)
+	}
+
+	// test with full config file
+	want = c
+	want.Name = "otherTest"
+	want.AF = "unit"
+	want.Address = "192.168.1.1"
+	want.Port = 12345
+	want.Sockfile = "test.sock"
+	want.Loglevel = "debug"
+	want.DisableHistory = true
+	want.PushAccounts = true
+	want.DisableFilterOwn = true
+	want.DisableEncryption = true
+
+	b, err := json.Marshal(want)
+	if err != nil {
+		log.Fatal(err)
+	}
+	writeTestConfigFile(dir, string(b))
+
+	got = NewConfig("testConfig")
+	got.Dir = dir
+	got.ReadFromFile()
+
+	if *got != *want {
+		t.Errorf("got %v, wanted %v", got, want)
 	}
 }
 
