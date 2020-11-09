@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"log"
@@ -16,6 +17,7 @@ func readConfigFile() {
 	// read working directory from command line arguments if present
 	dirFlags := flag.NewFlagSet("", flag.ContinueOnError)
 	dirFlags.StringVar(&conf.Dir, "dir", conf.Dir, "")
+	dirFlags.SetOutput(&bytes.Buffer{})
 	dirFlags.Usage = func() {}
 	dirFlags.Parse(os.Args[1:])
 
