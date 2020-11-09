@@ -580,31 +580,51 @@ func (m *mattermost) connect() bool {
 }
 
 // loop runs the main loop of the mattermost client handling websocket events
-func (m *mattermost) loop() {
+func (m *mattermost) loop() bool {
 	defer m.websock.Close()
 
 	// handle websocket events
 	for {
 		select {
-		case event := <-m.websock.EventChannel:
+		case event, more := <-m.websock.EventChannel:
+			if !more {
+				// event channel was closed unexpectedly,
+				// log error if present, set client offline
+				// and return an error to trigger a reconnect
+				if err := m.websock.ListenError; err != nil {
+					logError(getErrorMessage(err))
+				}
+				m.setOnline(false)
+				return false
+			}
+
+			// handle event
 			m.handleWebSocketEvent(event)
 		case <-m.done:
-			return
+			return true
 		}
 	}
 }
 
 // run starts the mattermost client
 func (m *mattermost) run() {
-	for !m.connect() {
-		select {
-		case <-time.After(15 * time.Second):
-			// wait before reconnecting
-		case <-m.done:
+	for {
+		// try to (re)connect to the server
+		for !m.connect() {
+			select {
+			case <-time.After(15 * time.Second):
+				// wait before reconnecting
+			case <-m.done:
+				return
+			}
+		}
+
+		// connection established, run main loop until we are done;
+		// if there is an error, reconnect to the server
+		if m.loop() {
 			return
 		}
 	}
-	m.loop()
 }
 
 // stop shuts down the mattermost client
