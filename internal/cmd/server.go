@@ -75,19 +75,25 @@ func (s *server) sendClient(msg string) {
 	clientQueue.send(msg)
 }
 
+// createAccountMessage creates an account message for account a
+func createAccountMessage(a *account) string {
+	// get account status
+	status := "offline"
+	if a.client != nil && a.client.isOnline() {
+		status = "online"
+	}
+
+	// return message with the following format:
+	// account: <id> <name> <protocol> <user> <status>
+	return fmt.Sprintf("account: %d %s %s %s %s\r\n", a.ID, "()",
+		a.Protocol, a.User, status)
+}
+
 // handleAccountList handles an account list command
 func (s *server) handleAccountList() {
 	for _, a := range getAccounts() {
-		// get account status
-		status := "offline"
-		if a.client != nil && a.client.isOnline() {
-			status = "online"
-		}
-
-		// send replies with the following format:
-		// account: <id> <name> <protocol> <user> <status>
-		r := fmt.Sprintf("account: %d %s %s %s %s\r\n", a.ID, "()",
-			a.Protocol, a.User, status)
+		// send account messages as replies
+		r := createAccountMessage(a)
 		logDebug(r)
 		s.sendClient(r)
 	}
@@ -110,13 +116,10 @@ func (s *server) handleAccountAdd(parts []string) {
 	// info: new account added.
 	s.sendClient(fmt.Sprintf("info: added account %d.\r\n", id))
 	if conf.PushAccounts {
+		// send account message with push accounts enabled
 		a := getAccount(id)
-		status := "offline"
-		if a.client != nil && a.client.isOnline() {
-			status = "online"
-		}
-		s.sendClient(fmt.Sprintf("account: %d %s %s %s %s\r\n", a.ID,
-			"()", a.Protocol, a.User, status))
+		m := createAccountMessage(a)
+		s.sendClient(m)
 	}
 }
 
