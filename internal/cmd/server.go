@@ -109,6 +109,15 @@ func (s *server) handleAccountAdd(parts []string) {
 	// optional reply:
 	// info: new account added.
 	s.sendClient(fmt.Sprintf("info: added account %d.\r\n", id))
+	if conf.PushAccounts {
+		a := getAccount(id)
+		status := "offline"
+		if a.client != nil && a.client.isOnline() {
+			status = "online"
+		}
+		s.sendClient(fmt.Sprintf("account: %d %s %s %s %s\r\n", a.ID,
+			"()", a.Protocol, a.User, status))
+	}
 }
 
 // handleAccountDelete handles an account delete command
