@@ -80,7 +80,7 @@ func (s *server) handleAccountList() {
 	for _, a := range getAccounts() {
 		// get account status
 		status := "offline"
-		if a.client.isOnline() {
+		if a.client != nil && a.client.isOnline() {
 			status = "online"
 		}
 
