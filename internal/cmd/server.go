@@ -108,7 +108,7 @@ func (s *server) handleAccountAdd(parts []string) {
 
 	// optional reply:
 	// info: new account added.
-	s.sendClient("info: new account added.\r\n")
+	s.sendClient(fmt.Sprintf("info: added account %d.\r\n", id))
 }
 
 // handleAccountDelete handles an account delete command
