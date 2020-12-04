@@ -91,13 +91,24 @@ func createAccountMessage(a *account) string {
 
 // handleAccountList handles an account list command
 func (s *server) handleAccountList() {
-	for _, a := range getAccounts() {
+	accounts := getAccounts()
+	for _, a := range accounts {
 		// send account messages as replies
 		r := createAccountMessage(a)
 		logDebug(r)
 		s.sendClient(r)
 	}
 	s.sendClient("info: listed accounts.\r\n")
+	if len(accounts) == 0 {
+		s.sendClient("info: You do not have any accounts " +
+			"configured.\r\n")
+		s.sendClient("info: You can add a new mattermost " +
+			"account with the following command: " +
+			"account add mattermost <username>@<server> " +
+			"<password>\r\n")
+		s.sendClient("info: Example: account add mattermost " +
+			"dummy@yourserver.org:8065 YourPassword\r\n")
+	}
 }
 
 // handleAccountAdd handles an account add command
