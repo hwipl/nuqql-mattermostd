@@ -394,8 +394,15 @@ func (s *server) handleClient() {
 	// enable client
 	s.clientActive = true
 
+	// send welcome message to client
+	s.sendClient(fmt.Sprintf("info: Welcome to nuqql-mattermostd v%s!\r\n",
+		backendVersion))
+	s.sendClient("info: Enter \"help\" for a list of available commands " +
+		"and their help texts\r\n")
+
 	// if push accounts is enabled, send list of accounts to client
 	if conf.PushAccounts {
+		s.sendClient("info: Listing your accounts:\r\n")
 		s.handleAccountList()
 	}
 
