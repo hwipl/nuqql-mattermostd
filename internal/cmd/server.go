@@ -97,6 +97,7 @@ func (s *server) handleAccountList() {
 		logDebug(r)
 		s.sendClient(r)
 	}
+	s.sendClient("info: listed accounts.\r\n")
 }
 
 // handleAccountAdd handles an account add command
