@@ -89,26 +89,32 @@ func createAccountMessage(a *account) string {
 		a.Protocol, a.User, status)
 }
 
-// handleAccountList handles an account list command
-func (s *server) handleAccountList() {
+// getAccountListMessages returns the account list as a string of messages
+func (s *server) getAccountListMessages() (messages string) {
 	accounts := getAccounts()
 	for _, a := range accounts {
-		// send account messages as replies
-		r := createAccountMessage(a)
-		logDebug(r)
-		s.sendClient(r)
+		messages += createAccountMessage(a)
 	}
-	s.sendClient("info: listed accounts.\r\n")
+	messages += "info: listed accounts.\r\n"
 	if len(accounts) == 0 {
-		s.sendClient("info: You do not have any accounts " +
-			"configured.\r\n")
-		s.sendClient("info: You can add a new mattermost " +
-			"account with the following command: " +
+		h := "info: You do not have any accounts configured.\r\n"
+		h += "info: You can add a new mattermost account with the " +
+			"following command: " +
 			"account add mattermost <username>@<server> " +
-			"<password>\r\n")
-		s.sendClient("info: Example: account add mattermost " +
-			"dummy@yourserver.org:8065 YourPassword\r\n")
+			"<password>\r\n"
+		h += "info: Example: account add mattermost " +
+			"dummy@yourserver.org:8065 YourPassword\r\n"
+		messages += h
 	}
+	return
+}
+
+// handleAccountList handles an account list command
+func (s *server) handleAccountList() {
+	// send messages as replies
+	r := s.getAccountListMessages()
+	logDebug(r)
+	s.sendClient(r)
 }
 
 // handleAccountAdd handles an account add command
