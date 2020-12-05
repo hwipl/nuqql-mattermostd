@@ -399,10 +399,37 @@ func (s *server) handleCommand(cmd string) {
 	}
 }
 
+// sendEarly sends msg to client, should only be used before client queue is
+// active
+func (s *server) sendEarly(msg string) {
+	w := bufio.NewWriter(s.conn)
+	n, err := w.WriteString(msg)
+	if n < len(msg) || err != nil {
+		logError(err)
+		return
+	}
+	if err := w.Flush(); err != nil {
+		logError(err)
+		return
+	}
+}
+
 // handleClient handles a single client connection
 func (s *server) handleClient() {
 	defer s.conn.Close()
 	logInfo("New client connection", s.conn.RemoteAddr())
+
+	// send welcome message to client
+	s.sendEarly(fmt.Sprintf("info: Welcome to nuqql-mattermostd v%s!\r\n",
+		backendVersion))
+	s.sendEarly("info: Enter \"help\" for a list of available commands " +
+		"and their help texts\r\n")
+
+	// if push accounts is enabled, send list of accounts to client
+	if conf.PushAccounts {
+		s.sendEarly("info: Listing your accounts:\r\n")
+		s.sendEarly(s.getAccountListMessages())
+	}
 
 	// configure client in queue
 	clientQueue.setClient(s.conn)
@@ -410,18 +437,6 @@ func (s *server) handleClient() {
 
 	// enable client
 	s.clientActive = true
-
-	// send welcome message to client
-	s.sendClient(fmt.Sprintf("info: Welcome to nuqql-mattermostd v%s!\r\n",
-		backendVersion))
-	s.sendClient("info: Enter \"help\" for a list of available commands " +
-		"and their help texts\r\n")
-
-	// if push accounts is enabled, send list of accounts to client
-	if conf.PushAccounts {
-		s.sendClient("info: Listing your accounts:\r\n")
-		s.handleAccountList()
-	}
 
 	// start client command handling loop
 	r := bufio.NewReader(s.conn)
