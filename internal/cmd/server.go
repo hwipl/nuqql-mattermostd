@@ -162,7 +162,7 @@ func (s *server) handleAccountBuddies(a *account) {
 
 // handleAccountCollect handles an account collect command
 func (s *server) handleAccountCollect(a *account) {
-	clientQueue.getHistory()
+	a.client.getHistory()
 }
 
 // handleAccountSend handles an account send command

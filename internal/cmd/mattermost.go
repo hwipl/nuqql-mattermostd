@@ -22,6 +22,8 @@ type mattermost struct {
 	done      chan bool
 	mutex     sync.Mutex
 	online    bool
+	history   []string
+	noHistory bool
 
 	// filterOwn toggles filtering of own messages
 	filterOwn bool
@@ -481,6 +483,35 @@ func (m *mattermost) setOnline(online bool) {
 	m.online = online
 }
 
+// addHistory adds msg to the account history
+func (m *mattermost) addHistory(msg string) {
+	if m.noHistory {
+		return
+	}
+	// only add "chat: msg:" or "message:" messages
+	if !strings.HasPrefix(msg, "chat: msg:") &&
+		!strings.HasPrefix(msg, "message:") {
+		return
+	}
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	m.history = append(m.history, msg)
+}
+
+// getHistory retrieves the account histoy
+func (m *mattermost) getHistory() {
+	if m.noHistory {
+		return
+	}
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	// send all messages to client
+	for _, msg := range m.history {
+		clientQueue.send(msg)
+	}
+}
+
 // getPostFiles returns the files attached to post as a string
 func (m *mattermost) getPostFiles(post *model.Post) string {
 	// return empty string if there are no files attached
@@ -550,6 +581,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		msg := fmt.Sprintf("chat: msg: %d %s %d %s %s\r\n",
 			m.accountID, post.ChannelId, post.CreateAt/1000,
 			username, html.EscapeString(text))
+		m.addHistory(msg)
 		clientQueue.send(msg)
 	}
 }
@@ -661,6 +693,7 @@ func newClient(config *Config, accountID int, server, username,
 		filterOwn:       filterOwn,
 		httpPrefix:      httpPrefix,
 		webSocketPrefix: webSocketPrefix,
+		noHistory:       config.DisableHistory,
 	}
 	return &m
 }
