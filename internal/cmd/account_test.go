@@ -154,7 +154,9 @@ func createTestWorkDir() string {
 }
 
 func removeTestWorkDir(dir string) {
-	os.RemoveAll(dir)
+	if err := os.RemoveAll(dir); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func TestAddAccount(t *testing.T) {

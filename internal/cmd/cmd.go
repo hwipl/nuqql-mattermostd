@@ -19,7 +19,9 @@ func readConfigFile() {
 	dirFlags.StringVar(&conf.Dir, "dir", conf.Dir, "")
 	dirFlags.SetOutput(&bytes.Buffer{})
 	dirFlags.Usage = func() {}
-	dirFlags.Parse(os.Args[1:])
+	if err := dirFlags.Parse(os.Args[1:]); err != nil {
+		// ignore error
+	}
 
 	// working directory is set now; read the config from the config file
 	conf.ReadFromFile()

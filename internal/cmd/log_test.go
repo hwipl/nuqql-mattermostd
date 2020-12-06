@@ -19,7 +19,9 @@ func setTestLogFile() {
 func unsetTestLogFile() {
 	log.SetOutput(os.Stderr)
 	loggingFile.Close()
-	os.Remove(loggingFile.Name())
+	if err := os.Remove(loggingFile.Name()); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func readTestLogFile() string {
