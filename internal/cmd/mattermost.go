@@ -533,6 +533,44 @@ func (m *mattermost) getPostFiles(post *model.Post) string {
 	return fileInfo
 }
 
+// handlePost handles the post
+func (m *mattermost) handlePost(post *model.Post) {
+	// filter own messages
+	if post.UserId == m.user.Id && m.filterOwn {
+		return
+	}
+
+	// construct message text including attached files
+	text := post.Message
+	if fileInfo := m.getPostFiles(post); fileInfo != "" {
+		if text != "" {
+			text += "\n\n"
+		}
+		text += fileInfo
+	}
+	logDebug("Message:", post.CreateAt, post.ChannelId,
+		post.UserId, text)
+
+	// get name of user who sent this message
+	username := post.UserId
+	user, resp := m.client.GetUser(post.UserId, "")
+	if resp.Error != nil {
+		logError(getErrorMessage(resp.Error))
+	} else {
+		username = user.Username
+	}
+
+	// construct message with format:
+	// chat: msg: <acc_id> <chat> <timestamp> <sender> <message>
+	// and send it via the client queue
+	msg := fmt.Sprintf("chat: msg: %d %s %d %s %s\r\n",
+		m.accountID, post.ChannelId, post.CreateAt/1000,
+		username, html.EscapeString(text))
+	m.addHistory(msg)
+	clientQueue.send(msg)
+
+}
+
 // handleWebSocketEvent handles events from the websocket
 func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	// check if event is valid
@@ -550,39 +588,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	post := model.PostFromJson(strings.NewReader(
 		event.GetData()["post"].(string)))
 	if post != nil {
-		// filter own messages
-		if post.UserId == m.user.Id && m.filterOwn {
-			return
-		}
-
-		// construct message text including attached files
-		text := post.Message
-		if fileInfo := m.getPostFiles(post); fileInfo != "" {
-			if text != "" {
-				text += "\n\n"
-			}
-			text += fileInfo
-		}
-		logDebug("Message:", post.CreateAt, post.ChannelId,
-			post.UserId, text)
-
-		// get name of user who sent this message
-		username := post.UserId
-		user, resp := m.client.GetUser(post.UserId, "")
-		if resp.Error != nil {
-			logError(getErrorMessage(resp.Error))
-		} else {
-			username = user.Username
-		}
-
-		// construct message with format:
-		// chat: msg: <acc_id> <chat> <timestamp> <sender> <message>
-		// and send it via the client queue
-		msg := fmt.Sprintf("chat: msg: %d %s %d %s %s\r\n",
-			m.accountID, post.ChannelId, post.CreateAt/1000,
-			username, html.EscapeString(text))
-		m.addHistory(msg)
-		clientQueue.send(msg)
+		m.handlePost(post)
 	}
 }
 
