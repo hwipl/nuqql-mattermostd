@@ -592,6 +592,57 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	}
 }
 
+// getOldChannelMessages retrieves old/unread messages of the channel
+// identified by id
+func (m *mattermost) getOldChannelMessages(id string) {
+	// TODO: get last known post id of channel
+	postId := ""
+	for {
+		// get batch of message after last know post id
+		posts, resp := m.client.GetPostsAfter(id, postId, 0, 60, "")
+		if resp.Error != nil {
+			logError(getErrorMessage(resp.Error))
+			return
+		}
+
+		// reverse message order
+		for i := len(posts.Order) - 1; i >= 0; i-- {
+			p := posts.Order[i]
+			m.handlePost(posts.Posts[p])
+			postId = p
+
+		}
+		if posts.NextPostId == "" {
+			break
+		}
+	}
+	// TODO: save last post id of channel
+}
+
+// getOldMessages retrieves old/unread messages
+func (m *mattermost) getOldMessages() {
+	// get teams
+	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
+	if resp.Error != nil {
+		logError(getErrorMessage(resp.Error))
+		return
+	}
+	for _, t := range teams {
+		// get channels
+		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
+			m.user.Id, false, "")
+		if resp.Error != nil {
+			logError(getErrorMessage(resp.Error))
+			return
+		}
+
+		// get messages in each channel
+		for _, c := range channels {
+			m.getOldChannelMessages(c.Id)
+		}
+	}
+}
+
 // connect connects to a mattermost server
 func (m *mattermost) connect() bool {
 	// login
@@ -603,6 +654,9 @@ func (m *mattermost) connect() bool {
 	}
 	logInfo("Logged in as user", user.Username)
 	m.user = user
+
+	// retrieve unread messages
+	m.getOldMessages()
 
 	// create websocket and start listening for events
 	websock, err := model.NewWebSocketClient4(m.webSocketPrefix+m.server,
