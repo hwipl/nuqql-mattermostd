@@ -572,6 +572,8 @@ func (m *mattermost) handlePost(post *model.Post) {
 	m.addHistory(msg)
 	clientQueue.send(msg)
 
+	// save last post id of channel
+	m.channels.updatePostID(post.ChannelId, post.Id)
 }
 
 // handleWebSocketEvent handles events from the websocket
@@ -619,8 +621,6 @@ func (m *mattermost) getOldChannelMessages(id string) {
 			break
 		}
 	}
-	// save last post id of channel
-	m.channels.updatePostID(id, postId)
 }
 
 // getOldMessages retrieves old/unread messages
