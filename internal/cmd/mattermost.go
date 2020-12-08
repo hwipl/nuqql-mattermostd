@@ -276,6 +276,9 @@ func (m *mattermost) partChannel(teamChannel string) {
 		logError(getErrorMessage(resp.Error))
 		return
 	}
+
+	// remove stored channel information
+	m.channels.deleteChannel(c.Id)
 }
 
 // addChannel adds user to channel

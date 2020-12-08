@@ -26,6 +26,12 @@ func (c *channels) updatePostID(chanID, postID string) {
 	c.writeToFile()
 }
 
+// deleteChannel removes the channel identified by its chanID
+func (c *channels) deleteChannel(chanID string) {
+	delete(c.postIDs, chanID)
+	c.writeToFile()
+}
+
 // readFromFile reads channels from file
 func (c *channels) readFromFile() {
 	file := filepath.Join(conf.Dir, c.fileName)
