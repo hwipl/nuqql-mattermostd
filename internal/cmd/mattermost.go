@@ -276,9 +276,6 @@ func (m *mattermost) partChannel(teamChannel string) {
 		logError(getErrorMessage(resp.Error))
 		return
 	}
-
-	// remove stored channel information
-	m.channels.deleteChannel(c.Id)
 }
 
 // addChannel adds user to channel
@@ -579,6 +576,23 @@ func (m *mattermost) handlePost(post *model.Post) {
 	m.channels.updatePostID(post.ChannelId, post.Id)
 }
 
+// handleRemoved handles user removed events
+func (m *mattermost) handleRemoved(event *model.WebSocketEvent) {
+	data := event.GetData()
+	userID := data["user_id"]
+	if userID != nil && userID != m.user.Id {
+		return
+	}
+	chanID, ok := data["channel_id"].(string)
+	if !ok {
+		return
+	}
+
+	// we are removed from channel, remove stored channel
+	// information
+	m.channels.deleteChannel(chanID)
+}
+
 // handleWebSocketEvent handles events from the websocket
 func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	// check if event is valid
@@ -587,7 +601,13 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	}
 	logDebug("WebSocket Event:", event.EventType())
 
-	// only handle posted events
+	// handle user removed events
+	if event.EventType() == model.WEBSOCKET_EVENT_USER_REMOVED {
+		m.handleRemoved(event)
+		return
+	}
+
+	// only handle posted events from this point on
 	if event.EventType() != model.WEBSOCKET_EVENT_POSTED {
 		return
 	}
