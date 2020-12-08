@@ -33,6 +33,9 @@ type mattermost struct {
 
 	// webSocketPrefix is prepended to the server to form a websocket url
 	webSocketPrefix string
+
+	// channels stores information of joined channels
+	channels *channels
 }
 
 // getErrorMessage converts an AppError to a string
@@ -595,8 +598,8 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 // getOldChannelMessages retrieves old/unread messages of the channel
 // identified by id
 func (m *mattermost) getOldChannelMessages(id string) {
-	// TODO: get last known post id of channel
-	postId := ""
+	// get last known post id of channel
+	postId := m.channels.getPostID(id)
 	for {
 		// get batch of message after last know post id
 		posts, resp := m.client.GetPostsAfter(id, postId, 0, 60, "")
@@ -616,7 +619,8 @@ func (m *mattermost) getOldChannelMessages(id string) {
 			break
 		}
 	}
-	// TODO: save last post id of channel
+	// save last post id of channel
+	m.channels.updatePostID(id, postId)
 }
 
 // getOldMessages retrieves old/unread messages
@@ -754,6 +758,7 @@ func newClient(config *Config, accountID int, server, username,
 		httpPrefix:      httpPrefix,
 		webSocketPrefix: webSocketPrefix,
 		noHistory:       config.DisableHistory,
+		channels:        newChannels(accountID),
 	}
 	return &m
 }
