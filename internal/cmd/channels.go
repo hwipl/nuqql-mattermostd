@@ -28,6 +28,7 @@ func (c *channels) updatePostID(chanID, postID string) {
 
 // deleteChannel removes the channel identified by its chanID
 func (c *channels) deleteChannel(chanID string) {
+	logDebug("Removing channel", chanID, "from stored channel info")
 	delete(c.postIDs, chanID)
 	c.writeToFile()
 }
