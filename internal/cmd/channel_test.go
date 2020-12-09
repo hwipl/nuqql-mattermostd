@@ -29,6 +29,32 @@ func TestChannelsGetPostID(t *testing.T) {
 	}
 }
 
+func TestChannelsUpdatePostID(t *testing.T) {
+	// configure working directory
+	dir := createTestWorkDir()
+	defer removeTestWorkDir(dir)
+	conf.Dir = dir
+
+	// create channels
+	c := newChannels(0)
+
+	// set channel/post id
+	c.updatePostID("channelID", "postID")
+	want := "postID"
+	got := c.getPostID("channelID")
+	if got != want {
+		t.Errorf("got %s, want %s", got, want)
+	}
+
+	// overwrite channel/post id
+	c.updatePostID("channelID", "newPostID")
+	want = "newPostID"
+	got = c.getPostID("channelID")
+	if got != want {
+		t.Errorf("got %s, want %s", got, want)
+	}
+}
+
 func TestChannelsReadFromFile(t *testing.T) {
 	// configure working directory
 	dir := createTestWorkDir()
