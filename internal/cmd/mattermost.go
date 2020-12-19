@@ -759,12 +759,6 @@ func (m *mattermost) stop() {
 func newClient(config *Config, accountID int, server, username,
 	password string) *mattermost {
 
-	// configure filtering of own messages
-	filterOwn := true
-	if config.DisableFilterOwn {
-		filterOwn = false
-	}
-
 	// configure encryption
 	httpPrefix := "https://"
 	webSocketPrefix := "wss://"
@@ -781,7 +775,7 @@ func newClient(config *Config, accountID int, server, username,
 		client:    model.NewAPIv4Client(httpPrefix + server),
 		done:      make(chan bool, 1),
 
-		filterOwn:       filterOwn,
+		filterOwn:       config.FilterOwn,
 		httpPrefix:      httpPrefix,
 		webSocketPrefix: webSocketPrefix,
 		noHistory:       config.DisableHistory,

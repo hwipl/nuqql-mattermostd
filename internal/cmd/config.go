@@ -38,8 +38,8 @@ type Config struct {
 	DisableHistory bool
 	// PushAccounts toggles pushing accounts to the client on connect
 	PushAccounts bool
-	// DisableFilterOwn disables filtering of own messages
-	DisableFilterOwn bool
+	// FilterOwn toggles filtering of own messages
+	FilterOwn bool
 	// DisableEncryption disables TLS encryption
 	DisableEncryption bool
 }

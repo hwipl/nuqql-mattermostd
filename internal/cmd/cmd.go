@@ -46,8 +46,8 @@ func parseCommandLine() {
 		conf.DisableHistory, "disable message history")
 	flag.BoolVar(&conf.PushAccounts, "push-accounts", conf.PushAccounts,
 		"push accounts to client")
-	flag.BoolVar(&conf.DisableFilterOwn, "disable-filterown",
-		conf.DisableFilterOwn, "disable filtering of own messages")
+	flag.BoolVar(&conf.FilterOwn, "filter-own", conf.FilterOwn,
+		"toggle filtering of own messages")
 	flag.BoolVar(&conf.DisableEncryption, "disable-encryption",
 		conf.DisableEncryption, "disable TLS encryption")
 
