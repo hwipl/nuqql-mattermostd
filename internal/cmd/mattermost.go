@@ -556,11 +556,15 @@ func (m *mattermost) handlePost(post *model.Post) {
 
 	// get name of user who sent this message
 	username := post.UserId
-	user, resp := m.client.GetUser(post.UserId, "")
-	if resp.Error != nil {
-		logError(getErrorMessage(resp.Error))
+	if post.UserId == m.user.Id {
+		username = "<self>"
 	} else {
-		username = user.Username
+		user, resp := m.client.GetUser(post.UserId, "")
+		if resp.Error != nil {
+			logError(getErrorMessage(resp.Error))
+		} else {
+			username = user.Username
+		}
 	}
 
 	// construct message with format:
