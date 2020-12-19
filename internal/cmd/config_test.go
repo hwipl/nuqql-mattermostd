@@ -121,7 +121,7 @@ func TestReadFromFile(t *testing.T) {
 	want.Loglevel = "debug"
 	want.DisableHistory = true
 	want.PushAccounts = true
-	want.DisableFilterOwn = true
+	want.FilterOwn = true
 	want.DisableEncryption = true
 
 	b, err := json.Marshal(want)
@@ -153,7 +153,7 @@ func TestNewConfig(t *testing.T) {
 	loglevel := "warn"
 	disableHistory := false
 	pushAccounts := false
-	disableFilterOwn := false
+	filterOwn := false
 	disableEncryption := false
 
 	c := NewConfig(name)
@@ -184,9 +184,8 @@ func TestNewConfig(t *testing.T) {
 	if c.PushAccounts != pushAccounts {
 		t.Errorf("got %t, wanted %t", c.PushAccounts, pushAccounts)
 	}
-	if c.DisableFilterOwn != disableFilterOwn {
-		t.Errorf("got %t, wanted %t", c.DisableFilterOwn,
-			disableFilterOwn)
+	if c.FilterOwn != filterOwn {
+		t.Errorf("got %t, wanted %t", c.FilterOwn, filterOwn)
 	}
 	if c.DisableEncryption != disableEncryption {
 		t.Errorf("got %t, wanted %t", c.DisableEncryption,
