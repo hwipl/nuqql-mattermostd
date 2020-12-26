@@ -56,10 +56,10 @@ Usage of ./nuqql-mattermostd:
         set working directory (default "/home/user/.config/nuqql-mattermostd")
   -disable-encryption
         disable TLS encryption
-  -disable-filterown
-        disable filtering of own messages
   -disable-history
         disable message history
+  -filter-own
+        toggle filtering of own messages
   -loglevel level
         set logging level: debug, info, warn, error (default "warn")
   -port port
