@@ -77,7 +77,7 @@ Usage of ./nuqql-mattermostd:
 * devel:
   * Add retrieval of messages since last login.
   * Disable filtering of own messages and change command line argument
-    `-disable-filterown` to `filter-own`.
+    `-disable-filterown` to `-filter-own`.
   * Rewrite sender of own messages to `<self>`.
   * Add message history per account.
   * Add/update welcome message, account adding help, account added info
