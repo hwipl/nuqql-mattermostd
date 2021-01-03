@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/go-asn1-ber/asn1-ber v1.5.3 // indirect
+	github.com/google/uuid v1.1.3 // indirect
 	github.com/mattermost/mattermost-server/v5 v5.30.1
 	github.com/tinylib/msgp v1.1.5 // indirect
 	github.com/wiggin77/merror v1.0.3 // indirect
