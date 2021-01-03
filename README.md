@@ -74,7 +74,7 @@ Usage of ./nuqql-mattermostd:
 
 ## Changes
 
-* devel:
+* v0.2.0:
   * Add retrieval of messages since last login.
   * Disable filtering of own messages and change command line argument
     `-disable-filterown` to `-filter-own`.

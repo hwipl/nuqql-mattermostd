@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	backendVersion = "0.1.0"
+	backendVersion = "0.2.0"
 )
 
 // readConfigFile reads the configuration from the config file
