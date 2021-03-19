@@ -631,7 +631,8 @@ func (m *mattermost) getOldChannelMessages(id string) {
 	postId := m.channels.getPostID(id)
 	for {
 		// get batch of message after last know post id
-		posts, resp := m.client.GetPostsAfter(id, postId, 0, 60, "")
+		posts, resp := m.client.GetPostsAfter(id, postId, 0, 60, "",
+			false)
 		if resp.Error != nil {
 			logError(getErrorMessage(resp.Error))
 			return
