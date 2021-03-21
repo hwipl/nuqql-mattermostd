@@ -724,6 +724,8 @@ func (m *mattermost) loop() bool {
 
 			// handle event
 			m.handleWebSocketEvent(event)
+		case <-m.websock.PingTimeoutChannel:
+			logError("websocket ping timeout")
 		case <-m.done:
 			return true
 		}
