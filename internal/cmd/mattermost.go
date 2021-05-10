@@ -91,10 +91,11 @@ func (m *mattermost) getTeamByName(name string) *model.Team {
 func (m *mattermost) getTeam(name string) *model.Team {
 	if name == "" {
 		// no team name given, try to get the first team the user is in
-		if len(m.teams) == 0 {
+		teams := m.getTeams()
+		if len(teams) == 0 {
 			return nil
 		}
-		return m.teams[0]
+		return teams[0]
 	}
 
 	// try to find team by id
@@ -425,7 +426,7 @@ func (m *mattermost) getBuddies() []*buddy {
 		return buddies
 	}
 
-	for _, t := range m.teams {
+	for _, t := range m.getTeams() {
 		// get channels
 		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
 			m.user.Id, false, "")
@@ -474,6 +475,20 @@ func (m *mattermost) setOnline(online bool) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	m.online = online
+}
+
+// setTeams sets the list of teams
+func (m *mattermost) setTeams(teams []*model.Team) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	m.teams = teams
+}
+
+// getTeams gets the list of teams
+func (m *mattermost) getTeams() []*model.Team {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.teams
 }
 
 // addHistory adds msg to the account history
@@ -578,7 +593,7 @@ func (m *mattermost) handleTeamChange(event *model.WebSocketEvent) {
 		logError(getErrorMessage(resp.Error))
 		return
 	}
-	m.teams = teams
+	m.setTeams(teams)
 }
 
 // handleRemoved handles user removed events
@@ -666,7 +681,7 @@ func (m *mattermost) getOldChannelMessages(id string) {
 
 // getOldMessages retrieves old/unread messages
 func (m *mattermost) getOldMessages() {
-	for _, t := range m.teams {
+	for _, t := range m.getTeams() {
 		// get channels
 		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
 			m.user.Id, false, "")
@@ -700,7 +715,7 @@ func (m *mattermost) connect() bool {
 		logError(getErrorMessage(resp.Error))
 		return false
 	}
-	m.teams = teams
+	m.setTeams(teams)
 
 	// retrieve unread messages
 	m.getOldMessages()
