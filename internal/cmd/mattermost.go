@@ -34,6 +34,9 @@ type mattermost struct {
 	// webSocketPrefix is prepended to the server to form a websocket url
 	webSocketPrefix string
 
+	// teams stores joined teams
+	teams []*model.Team
+
 	// channels stores information of joined channels
 	channels *channels
 }
@@ -88,17 +91,10 @@ func (m *mattermost) getTeamByName(name string) *model.Team {
 func (m *mattermost) getTeam(name string) *model.Team {
 	if name == "" {
 		// no team name given, try to get the first team the user is in
-		teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
-		if resp.Error != nil {
-			logError(getErrorMessage(resp.Error))
+		if len(m.teams) == 0 {
 			return nil
 		}
-
-		// return the first team if there are any teams
-		if len(teams) == 0 {
-			return nil
-		}
-		return teams[0]
+		return m.teams[0]
 	}
 
 	// try to find team by id
@@ -429,13 +425,7 @@ func (m *mattermost) getBuddies() []*buddy {
 		return buddies
 	}
 
-	// get teams
-	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
-	if resp.Error != nil {
-		logError(getErrorMessage(resp.Error))
-		return nil
-	}
-	for _, t := range teams {
+	for _, t := range m.teams {
 		// get channels
 		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
 			m.user.Id, false, "")
@@ -653,13 +643,7 @@ func (m *mattermost) getOldChannelMessages(id string) {
 
 // getOldMessages retrieves old/unread messages
 func (m *mattermost) getOldMessages() {
-	// get teams
-	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
-	if resp.Error != nil {
-		logError(getErrorMessage(resp.Error))
-		return
-	}
-	for _, t := range teams {
+	for _, t := range m.teams {
 		// get channels
 		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
 			m.user.Id, false, "")
@@ -686,6 +670,14 @@ func (m *mattermost) connect() bool {
 	}
 	logInfo("Logged in as user", user.Username)
 	m.user = user
+
+	// get teams
+	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
+	if resp.Error != nil {
+		logError(getErrorMessage(resp.Error))
+		return false
+	}
+	m.teams = teams
 
 	// retrieve unread messages
 	m.getOldMessages()
