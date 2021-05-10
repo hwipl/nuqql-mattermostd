@@ -570,6 +570,17 @@ func (m *mattermost) handlePost(post *model.Post) {
 	m.channels.updatePostID(post.ChannelId, post.Id)
 }
 
+// handleTeamChange handles team change events
+func (m *mattermost) handleTeamChange(event *model.WebSocketEvent) {
+	// update stored teams if possible
+	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
+	if resp.Error != nil {
+		logError(getErrorMessage(resp.Error))
+		return
+	}
+	m.teams = teams
+}
+
 // handleRemoved handles user removed events
 func (m *mattermost) handleRemoved(event *model.WebSocketEvent) {
 	data := event.GetData()
@@ -595,8 +606,20 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	}
 	logDebug("WebSocket Event:", event.EventType())
 
+	// handle special events
+	switch event.EventType() {
+
+	// handle team change events
+	case model.WEBSOCKET_EVENT_ADDED_TO_TEAM,
+		model.WEBSOCKET_EVENT_LEAVE_TEAM,
+		model.WEBSOCKET_EVENT_UPDATE_TEAM,
+		model.WEBSOCKET_EVENT_DELETE_TEAM,
+		model.WEBSOCKET_EVENT_RESTORE_TEAM:
+		m.handleTeamChange(event)
+		return
+
 	// handle user removed events
-	if event.EventType() == model.WEBSOCKET_EVENT_USER_REMOVED {
+	case model.WEBSOCKET_EVENT_USER_REMOVED:
 		m.handleRemoved(event)
 		return
 	}
