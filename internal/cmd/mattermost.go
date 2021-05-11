@@ -599,17 +599,6 @@ func (m *mattermost) handlePost(post *model.Post) {
 	m.channels.updatePostID(post.ChannelId, post.Id)
 }
 
-// handleTeamChange handles team change events
-func (m *mattermost) handleTeamChange(event *model.WebSocketEvent) {
-	// update stored teams if possible
-	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
-	if resp.Error != nil {
-		logError(getErrorMessage(resp.Error))
-		return
-	}
-	m.setTeams(teams)
-}
-
 // handleRemoved handles user removed events
 func (m *mattermost) handleRemoved(event *model.WebSocketEvent) {
 	data := event.GetData()
@@ -625,6 +614,38 @@ func (m *mattermost) handleRemoved(event *model.WebSocketEvent) {
 	// we are removed from channel, remove stored channel
 	// information
 	m.channels.deleteChannel(chanID)
+}
+
+// handleTeamChannelChange handles team and channel change events
+func (m *mattermost) handleTeamChannelChange(event *model.WebSocketEvent) {
+	// handle removed events
+	if event.EventType() == model.WEBSOCKET_EVENT_USER_REMOVED {
+		m.handleRemoved(event)
+	}
+
+	// get teams
+	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
+	if resp.Error != nil {
+		logError(getErrorMessage(resp.Error))
+		return
+	}
+
+	// get channels
+	teamChannels := make(teamChannels)
+	for _, t := range teams {
+		// get channels
+		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
+			m.user.Id, false, "")
+		if resp.Error != nil {
+			logError(getErrorMessage(resp.Error))
+			return
+		}
+
+		teamChannels[t] = channels
+	}
+
+	// update teams and channels
+	m.setTeamChannels(teamChannels)
 }
 
 // handleWebSocketEvent handles events from the websocket
@@ -644,12 +665,25 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		model.WEBSOCKET_EVENT_UPDATE_TEAM,
 		model.WEBSOCKET_EVENT_DELETE_TEAM,
 		model.WEBSOCKET_EVENT_RESTORE_TEAM:
-		m.handleTeamChange(event)
+		m.handleTeamChannelChange(event)
 		return
 
-	// handle user removed events
-	case model.WEBSOCKET_EVENT_USER_REMOVED:
-		m.handleRemoved(event)
+	// handle channel change events
+	case model.WEBSOCKET_EVENT_CHANNEL_CONVERTED,
+		model.WEBSOCKET_EVENT_CHANNEL_CREATED,
+		model.WEBSOCKET_EVENT_CHANNEL_DELETED,
+		model.WEBSOCKET_EVENT_CHANNEL_UPDATED,
+		model.WEBSOCKET_EVENT_CHANNEL_MEMBER_UPDATED:
+		m.handleTeamChannelChange(event)
+		return
+
+	// hande user change events
+	case model.WEBSOCKET_EVENT_USER_ADDED,
+		model.WEBSOCKET_EVENT_USER_UPDATED,
+		model.WEBSOCKET_EVENT_USER_ROLE_UPDATED,
+		model.WEBSOCKET_EVENT_MEMBERROLE_UPDATED,
+		model.WEBSOCKET_EVENT_USER_REMOVED:
+		m.handleTeamChannelChange(event)
 		return
 	}
 
