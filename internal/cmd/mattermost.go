@@ -10,6 +10,9 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
+// teamChannels stores a mapping from team to a list of channels of the team
+type teamChannels map[*model.Team][]*model.Channel
+
 // mattermost stores mattermost client information
 type mattermost struct {
 	accountID int
@@ -489,6 +492,20 @@ func (m *mattermost) getTeams() []*model.Team {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	return m.teams
+}
+
+// setTeamChannels sets the map of teams and their channels
+func (m *mattermost) setTeamChannels(t teamChannels) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	m.teamChannels = t
+}
+
+// getTeamChannels gets the map of teams and their channels
+func (m *mattermost) getTeamChannels() teamChannels {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.teamChannels
 }
 
 // addHistory adds msg to the account history
