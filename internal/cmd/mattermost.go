@@ -37,9 +37,6 @@ type mattermost struct {
 	// webSocketPrefix is prepended to the server to form a websocket url
 	webSocketPrefix string
 
-	// teams stores joined teams
-	teams []*model.Team
-
 	// teamChannels stores joined channels for each team
 	teamChannels teamChannels
 
@@ -97,7 +94,10 @@ func (m *mattermost) getTeamByName(name string) *model.Team {
 func (m *mattermost) getTeam(name string) *model.Team {
 	if name == "" {
 		// no team name given, try to get the first team the user is in
-		teams := m.getTeams()
+		teams := []*model.Team{}
+		for t := range m.getTeamChannels() {
+			teams = append(teams, t)
+		}
 		if len(teams) == 0 {
 			return nil
 		}
@@ -477,20 +477,6 @@ func (m *mattermost) setOnline(online bool) {
 	m.online = online
 }
 
-// setTeams sets the list of teams
-func (m *mattermost) setTeams(teams []*model.Team) {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-	m.teams = teams
-}
-
-// getTeams gets the list of teams
-func (m *mattermost) getTeams() []*model.Team {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-	return m.teams
-}
-
 // setTeamChannels sets the map of teams and their channels
 func (m *mattermost) setTeamChannels(t teamChannels) {
 	m.mutex.Lock()
@@ -755,7 +741,6 @@ func (m *mattermost) connect() bool {
 		logError(getErrorMessage(resp.Error))
 		return false
 	}
-	m.setTeams(teams)
 
 	// get channels
 	teamChannels := make(teamChannels)
