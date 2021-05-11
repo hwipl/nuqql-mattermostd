@@ -656,10 +656,10 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 // identified by id
 func (m *mattermost) getOldChannelMessages(id string) {
 	// get last known post id of channel
-	postId := m.channels.getPostID(id)
+	postID := m.channels.getPostID(id)
 	for {
 		// get batch of message after last know post id
-		posts, resp := m.client.GetPostsAfter(id, postId, 0, 60, "",
+		posts, resp := m.client.GetPostsAfter(id, postID, 0, 60, "",
 			false)
 		if resp.Error != nil {
 			logError(getErrorMessage(resp.Error))
@@ -670,7 +670,7 @@ func (m *mattermost) getOldChannelMessages(id string) {
 		for i := len(posts.Order) - 1; i >= 0; i-- {
 			p := posts.Order[i]
 			m.handlePost(posts.Posts[p])
-			postId = p
+			postID = p
 
 		}
 		if posts.NextPostId == "" {
