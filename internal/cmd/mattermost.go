@@ -40,6 +40,9 @@ type mattermost struct {
 	// teams stores joined teams
 	teams []*model.Team
 
+	// teamChannels stores joined channels for each team
+	teamChannels teamChannels
+
 	// channels stores information of joined channels
 	channels *channels
 }
@@ -429,14 +432,8 @@ func (m *mattermost) getBuddies() []*buddy {
 		return buddies
 	}
 
-	for _, t := range m.getTeams() {
+	for t, channels := range m.getTeamChannels() {
 		// get channels
-		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
-			m.user.Id, false, "")
-		if resp.Error != nil {
-			logError(getErrorMessage(resp.Error))
-			return nil
-		}
 		for _, c := range channels {
 			user := c.Id
 			name := m.getChannelName(c) +
@@ -698,15 +695,7 @@ func (m *mattermost) getOldChannelMessages(id string) {
 
 // getOldMessages retrieves old/unread messages
 func (m *mattermost) getOldMessages() {
-	for _, t := range m.getTeams() {
-		// get channels
-		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
-			m.user.Id, false, "")
-		if resp.Error != nil {
-			logError(getErrorMessage(resp.Error))
-			return
-		}
-
+	for _, channels := range m.getTeamChannels() {
 		// get messages in each channel
 		for _, c := range channels {
 			m.getOldChannelMessages(c.Id)
@@ -733,6 +722,23 @@ func (m *mattermost) connect() bool {
 		return false
 	}
 	m.setTeams(teams)
+
+	// get channels
+	teamChannels := make(teamChannels)
+	for _, t := range teams {
+		// get channels
+		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
+			m.user.Id, false, "")
+		if resp.Error != nil {
+			logError(getErrorMessage(resp.Error))
+			return false
+		}
+
+		teamChannels[t] = channels
+	}
+
+	// save teams and channels
+	m.setTeamChannels(teamChannels)
 
 	// retrieve unread messages
 	m.getOldMessages()
