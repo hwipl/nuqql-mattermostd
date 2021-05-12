@@ -10,8 +10,13 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
+// teamChannel contains a team's channel
+type teamChannel struct {
+	channel *model.Channel
+}
+
 // teamChannels stores a mapping from team to a list of channels of the team
-type teamChannels map[*model.Team][]*model.Channel
+type teamChannels map[*model.Team][]*teamChannel
 
 // mattermost stores mattermost client information
 type mattermost struct {
@@ -432,11 +437,11 @@ func (m *mattermost) getBuddies() []*buddy {
 		return buddies
 	}
 
-	for t, channels := range m.getTeamChannels() {
+	for t, teamChannels := range m.getTeamChannels() {
 		// get channels
-		for _, c := range channels {
-			user := c.Id
-			name := m.getChannelName(c) +
+		for _, tc := range teamChannels {
+			user := tc.channel.Id
+			name := m.getChannelName(tc.channel) +
 				" (" + t.DisplayName + ")"
 			status := "GROUP_CHAT"
 			b := newBuddy(user, name, status)
@@ -627,7 +632,10 @@ func (m *mattermost) handleTeamChannelChange(event *model.WebSocketEvent) {
 			return
 		}
 
-		teamChannels[t] = channels
+		for _, c := range channels {
+			tc := &teamChannel{channel: c}
+			teamChannels[t] = append(teamChannels[t], tc)
+		}
 	}
 
 	// update teams and channels
@@ -715,10 +723,10 @@ func (m *mattermost) getOldChannelMessages(id string) {
 
 // getOldMessages retrieves old/unread messages
 func (m *mattermost) getOldMessages() {
-	for _, channels := range m.getTeamChannels() {
+	for _, teamChannels := range m.getTeamChannels() {
 		// get messages in each channel
-		for _, c := range channels {
-			m.getOldChannelMessages(c.Id)
+		for _, tc := range teamChannels {
+			m.getOldChannelMessages(tc.channel.Id)
 		}
 	}
 }
@@ -753,7 +761,10 @@ func (m *mattermost) connect() bool {
 			return false
 		}
 
-		teamChannels[t] = channels
+		for _, c := range channels {
+			tc := &teamChannel{channel: c}
+			teamChannels[t] = append(teamChannels[t], tc)
+		}
 	}
 
 	// save teams and channels
