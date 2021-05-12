@@ -496,6 +496,42 @@ func (m *mattermost) getTeamChannels() teamChannels {
 	return m.teamChannels
 }
 
+// updateTeamChannels updates the teams and their channels
+func (m *mattermost) updateTeamChannels() bool {
+	// get teams
+	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
+	if resp.Error != nil {
+		logError(getErrorMessage(resp.Error))
+		return false
+	}
+
+	// get channels
+	teamChannels := make(teamChannels)
+	for _, t := range teams {
+		// get channels
+		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
+			m.user.Id, false, "")
+		if resp.Error != nil {
+			logError(getErrorMessage(resp.Error))
+			return false
+		}
+
+		for _, c := range channels {
+			// get name of the channel
+			name := m.getChannelName(c) +
+				" (" + t.DisplayName + ")"
+			tc := &teamChannel{c, name}
+
+			teamChannels[t] = append(teamChannels[t], tc)
+		}
+	}
+
+	// update teams and channels
+	m.setTeamChannels(teamChannels)
+
+	return true
+}
+
 // addHistory adds msg to the account history
 func (m *mattermost) addHistory(msg string) {
 	if m.noHistory {
@@ -614,36 +650,8 @@ func (m *mattermost) handleTeamChannelChange(event *model.WebSocketEvent) {
 		m.handleRemoved(event)
 	}
 
-	// get teams
-	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
-	if resp.Error != nil {
-		logError(getErrorMessage(resp.Error))
-		return
-	}
-
-	// get channels
-	teamChannels := make(teamChannels)
-	for _, t := range teams {
-		// get channels
-		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
-			m.user.Id, false, "")
-		if resp.Error != nil {
-			logError(getErrorMessage(resp.Error))
-			return
-		}
-
-		for _, c := range channels {
-			// get name of the channel
-			name := m.getChannelName(c) +
-				" (" + t.DisplayName + ")"
-			tc := &teamChannel{c, name}
-
-			teamChannels[t] = append(teamChannels[t], tc)
-		}
-	}
-
 	// update teams and channels
-	m.setTeamChannels(teamChannels)
+	m.updateTeamChannels()
 }
 
 // handleWebSocketEvent handles events from the websocket
@@ -747,36 +755,10 @@ func (m *mattermost) connect() bool {
 	logInfo("Logged in as user", user.Username)
 	m.user = user
 
-	// get teams
-	teams, resp := m.client.GetTeamsForUser(m.user.Id, "")
-	if resp.Error != nil {
-		logError(getErrorMessage(resp.Error))
+	// update teams and channels
+	if !m.updateTeamChannels() {
 		return false
 	}
-
-	// get channels
-	teamChannels := make(teamChannels)
-	for _, t := range teams {
-		// get channels
-		channels, resp := m.client.GetChannelsForTeamForUser(t.Id,
-			m.user.Id, false, "")
-		if resp.Error != nil {
-			logError(getErrorMessage(resp.Error))
-			return false
-		}
-
-		for _, c := range channels {
-			// get name of the channel
-			name := m.getChannelName(c) +
-				" (" + t.DisplayName + ")"
-			tc := &teamChannel{c, name}
-
-			teamChannels[t] = append(teamChannels[t], tc)
-		}
-	}
-
-	// save teams and channels
-	m.setTeamChannels(teamChannels)
 
 	// retrieve unread messages
 	m.getOldMessages()
