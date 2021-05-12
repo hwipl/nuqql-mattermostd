@@ -10,9 +10,10 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
-// teamChannel contains a team's channel
+// teamChannel contains a team's channel and its name
 type teamChannel struct {
 	channel *model.Channel
+	name    string
 }
 
 // teamChannels stores a mapping from team to a list of channels of the team
@@ -437,12 +438,11 @@ func (m *mattermost) getBuddies() []*buddy {
 		return buddies
 	}
 
-	for t, teamChannels := range m.getTeamChannels() {
+	for _, teamChannels := range m.getTeamChannels() {
 		// get channels
 		for _, tc := range teamChannels {
 			user := tc.channel.Id
-			name := m.getChannelName(tc.channel) +
-				" (" + t.DisplayName + ")"
+			name := tc.name
 			status := "GROUP_CHAT"
 			b := newBuddy(user, name, status)
 			buddies = append(buddies, b)
@@ -633,7 +633,11 @@ func (m *mattermost) handleTeamChannelChange(event *model.WebSocketEvent) {
 		}
 
 		for _, c := range channels {
-			tc := &teamChannel{channel: c}
+			// get name of the channel
+			name := m.getChannelName(c) +
+				" (" + t.DisplayName + ")"
+			tc := &teamChannel{c, name}
+
 			teamChannels[t] = append(teamChannels[t], tc)
 		}
 	}
@@ -762,7 +766,11 @@ func (m *mattermost) connect() bool {
 		}
 
 		for _, c := range channels {
-			tc := &teamChannel{channel: c}
+			// get name of the channel
+			name := m.getChannelName(c) +
+				" (" + t.DisplayName + ")"
+			tc := &teamChannel{c, name}
+
 			teamChannels[t] = append(teamChannels[t], tc)
 		}
 	}
