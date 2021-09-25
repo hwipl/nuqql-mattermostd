@@ -57,7 +57,11 @@ func writeTestConfigFile(dir, content string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	// write content to config file
 	_, err = f.WriteString(content)
