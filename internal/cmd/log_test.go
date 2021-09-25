@@ -18,7 +18,9 @@ func setTestLogFile() {
 
 func unsetTestLogFile() {
 	log.SetOutput(os.Stderr)
-	loggingFile.Close()
+	if err := loggingFile.Close(); err != nil {
+		log.Fatal(err)
+	}
 	if err := os.Remove(loggingFile.Name()); err != nil {
 		log.Fatal(err)
 	}

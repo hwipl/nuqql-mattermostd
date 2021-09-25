@@ -74,7 +74,9 @@ func getLogLevel(level string) int {
 // stopLogging stops looging to the log file
 func stopLogging() {
 	log.SetOutput(os.Stderr)
-	loggingFile.Close()
+	if err := loggingFile.Close(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 // initLogging initializes logging to the log file
