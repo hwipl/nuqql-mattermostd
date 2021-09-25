@@ -416,7 +416,11 @@ func (s *server) sendEarly(msg string) {
 
 // handleClient handles a single client connection
 func (s *server) handleClient() {
-	defer s.conn.Close()
+	defer func() {
+		if err := s.conn.Close(); err != nil {
+			logError(err)
+		}
+	}()
 	logInfo("New client connection", s.conn.RemoteAddr())
 
 	// send welcome message to client
@@ -472,7 +476,11 @@ func (s *server) run() {
 	if err != nil {
 		logFatal(err)
 	}
-	defer l.Close()
+	defer func() {
+		if err := l.Close(); err != nil {
+			logError(err)
+		}
+	}()
 	s.listener = l
 	s.serverActive = true
 
