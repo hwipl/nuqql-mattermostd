@@ -219,7 +219,7 @@ func TestDelAccount(t *testing.T) {
 	// test deleting dummy account
 	delAccount(id)
 
-	var want *account = nil
+	var want *account
 	got := getAccount(id)
 	if got != want {
 		t.Errorf("got %p, wanted %p", got, want)
