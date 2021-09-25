@@ -24,13 +24,17 @@ func (q *queue) sendToClient() {
 		msg := q.queue[0]
 		n, err := w.WriteString(msg)
 		if n < len(msg) || err != nil {
-			q.client.Close()
+			if err := q.client.Close(); err != nil {
+				logError(err)
+			}
 			q.client = nil
 			logError(err)
 			break
 		}
 		if err := w.Flush(); err != nil {
-			q.client.Close()
+			if err := q.client.Close(); err != nil {
+				logError(err)
+			}
 			q.client = nil
 			logError(err)
 			break
