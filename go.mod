@@ -3,7 +3,7 @@ module github.com/hwipl/nuqql-mattermostd
 go 1.15
 
 require (
-	github.com/mattermost/mattermost-server/v6 v6.2.0
+	github.com/mattermost/mattermost-server/v6 v6.2.1
 	github.com/minio/minio-go/v7 v7.0.18 // indirect
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
