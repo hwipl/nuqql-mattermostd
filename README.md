@@ -74,7 +74,7 @@ Usage of ./nuqql-mattermostd:
 
 ## Changes
 
-* devel:
+* v0.3.0:
   * Update mattermost to v6.4.2
   * Cleanups, fixes and improvements
 * v0.2.0:
