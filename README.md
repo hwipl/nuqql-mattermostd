@@ -12,7 +12,7 @@ You can download and install nuqql-mattermostd with its dependencies to your
 GOPATH or GOBIN with the go tool:
 
 ```console
-$ go get github.com/hwipl/nuqql-mattermostd/cmd/nuqql-mattermostd
+$ go install github.com/hwipl/nuqql-mattermostd/cmd/nuqql-mattermostd
 ```
 
 Make sure your GOPATH or GOBIN (e.g., `~/go/bin`) is in your PATH.
