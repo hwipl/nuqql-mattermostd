@@ -2,7 +2,7 @@ module github.com/hwipl/nuqql-mattermostd
 
 go 1.18
 
-require github.com/mattermost/mattermost-server/v6 v6.7.0
+require github.com/mattermost/mattermost-server/v6 v6.7.1
 
 require (
 	github.com/blang/semver v3.5.1+incompatible // indirect
@@ -14,13 +14,13 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/graph-gophers/graphql-go v1.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.15.4 // indirect
-	github.com/klauspost/cpuid/v2 v2.0.12 // indirect
+	github.com/klauspost/compress v1.15.6 // indirect
+	github.com/klauspost/cpuid/v2 v2.0.13 // indirect
 	github.com/mattermost/go-i18n v1.11.1-0.20211013152124-5c415071e404 // indirect
 	github.com/mattermost/ldap v0.0.0-20201202150706-ee0e6284187d // indirect
 	github.com/mattermost/logr/v2 v2.0.15 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.26 // indirect
+	github.com/minio/minio-go/v7 v7.0.28 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -36,11 +36,11 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/wiggin77/merror v1.0.3 // indirect
 	github.com/wiggin77/srslog v1.0.1 // indirect
-	golang.org/x/crypto v0.0.0-20220513210258-46612604a0f9 // indirect
-	golang.org/x/net v0.0.0-20220513224357-95641704303c // indirect
-	golang.org/x/sys v0.0.0-20220513210249-45d2b4557a2a // indirect
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
+	golang.org/x/net v0.0.0-20220607020251-c690dde0001d // indirect
+	golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d // indirect
 	golang.org/x/text v0.3.7 // indirect
-	gopkg.in/ini.v1 v1.66.4 // indirect
+	gopkg.in/ini.v1 v1.66.6 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
