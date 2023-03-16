@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -56,6 +57,11 @@ quit
     quit backend
 help
     show this help` + "\r\n"
+)
+
+var (
+	// brRegex is a regular expression for <br/> tags
+	brRegex = regexp.MustCompile("(?i)<br/>")
 )
 
 // server stores server information
@@ -165,6 +171,14 @@ func (s *server) handleAccountCollect(a *account) {
 	a.client.getHistory()
 }
 
+// unescapeMessage converts nuqql message to original format:
+// nuqql sends html-escaped messages with newlines replaced by <br/>
+func unescapeMessage(msg string) string {
+	msg = brRegex.ReplaceAllString(msg, "\n")
+	msg = html.UnescapeString(msg)
+	return msg
+}
+
 // handleAccountSend handles an account send command
 func (s *server) handleAccountSend(a *account, parts []string) {
 	// account <id> send <user> <msg>
@@ -174,7 +188,7 @@ func (s *server) handleAccountSend(a *account, parts []string) {
 	channel := parts[3]
 	msg := strings.Join(parts[4:], " ")
 	logDebug("sending message to channel "+channel+":", msg)
-	a.client.sendMsg(channel, html.UnescapeString(msg))
+	a.client.sendMsg(channel, unescapeMessage(msg))
 }
 
 // handleAccountStatusGet handles an account status get command
@@ -261,7 +275,7 @@ func (s *server) handleAccountChatSend(a *account, parts []string) {
 	channel := parts[4]
 	msg := strings.Join(parts[5:], " ")
 	logDebug("sending message to channel "+channel+":", msg)
-	a.client.sendMsg(channel, html.UnescapeString(msg))
+	a.client.sendMsg(channel, unescapeMessage(msg))
 }
 
 // handleAccountChat handles an account chat users command
