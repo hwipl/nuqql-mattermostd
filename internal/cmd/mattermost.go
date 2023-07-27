@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html"
@@ -8,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mattermost/mattermost-server/v6/model"
+	"github.com/mattermost/mattermost/server/public/model"
 )
 
 // teamChannel contains a team's channel and its name
@@ -76,7 +77,7 @@ func (m *mattermost) getTeamByID(id string) *model.Team {
 	if !model.IsValidId(id) {
 		return nil
 	}
-	t, _, err := m.client.GetTeam(id, "")
+	t, _, err := m.client.GetTeam(context.TODO(), id, "")
 	if err != nil {
 		return nil
 	}
@@ -88,7 +89,7 @@ func (m *mattermost) getTeamByName(name string) *model.Team {
 	if !model.IsValidTeamName(name) {
 		return nil
 	}
-	t, _, err := m.client.GetTeamByName(name, "")
+	t, _, err := m.client.GetTeamByName(context.TODO(), name, "")
 	if err != nil {
 		return nil
 	}
@@ -125,7 +126,7 @@ func (m *mattermost) getChannelByID(id string) *model.Channel {
 	if !model.IsValidId(id) {
 		return nil
 	}
-	c, _, err := m.client.GetChannel(id, "")
+	c, _, err := m.client.GetChannel(context.TODO(), id, "")
 	if err != nil {
 		return nil
 	}
@@ -137,7 +138,7 @@ func (m *mattermost) getChannelByName(teamID, name string) *model.Channel {
 	if !model.IsValidChannelIdentifier(name) {
 		return nil
 	}
-	c, _, err := m.client.GetChannelByName(name, teamID, "")
+	c, _, err := m.client.GetChannelByName(context.TODO(), name, teamID, "")
 	if err != nil {
 		return nil
 	}
@@ -161,7 +162,7 @@ func (m *mattermost) getUserByID(id string) *model.User {
 	if !model.IsValidId(id) {
 		return nil
 	}
-	u, _, err := m.client.GetUser(id, "")
+	u, _, err := m.client.GetUser(context.TODO(), id, "")
 	if err != nil {
 		return nil
 	}
@@ -173,7 +174,7 @@ func (m *mattermost) getUserByEmail(email string) *model.User {
 	if !model.IsValidEmail(email) {
 		return nil
 	}
-	u, _, err := m.client.GetUserByEmail(email, "")
+	u, _, err := m.client.GetUserByEmail(context.TODO(), email, "")
 	if err != nil {
 		return nil
 	}
@@ -185,7 +186,7 @@ func (m *mattermost) getUserByUsername(username string) *model.User {
 	if !model.IsValidUsername(username) {
 		return nil
 	}
-	u, _, err := m.client.GetUserByUsername(username, "")
+	u, _, err := m.client.GetUserByUsername(context.TODO(), username, "")
 	if err != nil {
 		return nil
 	}
@@ -218,7 +219,7 @@ func (m *mattermost) createChannel(team *model.Team, name string) {
 		Type:        model.ChannelTypePrivate,
 		TeamId:      team.Id,
 	}
-	c, _, err := m.client.CreateChannel(c)
+	c, _, err := m.client.CreateChannel(context.TODO(), c)
 	if err != nil {
 		logError(err)
 	}
@@ -250,7 +251,7 @@ func (m *mattermost) joinChannel(teamChannel string) {
 	}
 
 	// channel exist, add current user to channel
-	_, _, err := m.client.AddChannelMember(c.Id, m.user.Id)
+	_, _, err := m.client.AddChannelMember(context.TODO(), c.Id, m.user.Id)
 	if err != nil {
 		logError(err)
 		return
@@ -281,7 +282,7 @@ func (m *mattermost) partChannel(teamChannel string) {
 	}
 
 	// remove current user from channel
-	_, err := m.client.RemoveUserFromChannel(c.Id, m.user.Id)
+	_, err := m.client.RemoveUserFromChannel(context.TODO(), c.Id, m.user.Id)
 	if err != nil {
 		logError(err)
 		return
@@ -319,7 +320,7 @@ func (m *mattermost) addChannel(teamChannel, user string) {
 	}
 
 	// add user to channel
-	_, _, err := m.client.AddChannelMember(c.Id, u.Id)
+	_, _, err := m.client.AddChannelMember(context.TODO(), c.Id, u.Id)
 	if err != nil {
 		logError(err)
 		return
@@ -332,7 +333,7 @@ func (m *mattermost) getStatus() string {
 		return "offline"
 	}
 
-	status, _, err := m.client.GetUserStatus(m.user.Id, "")
+	status, _, err := m.client.GetUserStatus(context.TODO(), m.user.Id, "")
 	if err != nil {
 		logError(err)
 		return ""
@@ -362,7 +363,7 @@ func (m *mattermost) setStatus(status string) {
 		UserId: m.user.Id,
 		Status: status,
 	}
-	_, _, err := m.client.UpdateUserStatus(m.user.Id, &s)
+	_, _, err := m.client.UpdateUserStatus(context.TODO(), m.user.Id, &s)
 	if err != nil {
 		logError(err)
 	}
@@ -377,7 +378,7 @@ func (m *mattermost) getChannelUsers(channel string) []*buddy {
 	}
 
 	// retrieve channel members
-	members, _, err := m.client.GetChannelMembers(channel, 0, 60, "")
+	members, _, err := m.client.GetChannelMembers(context.TODO(), channel, 0, 60, "")
 	if err != nil {
 		logError(err)
 		return nil
@@ -386,13 +387,13 @@ func (m *mattermost) getChannelUsers(channel string) []*buddy {
 	// try to get user information of channel members
 	for _, member := range members {
 		// user name
-		user, _, err := m.client.GetUser(member.UserId, "")
+		user, _, err := m.client.GetUser(context.TODO(), member.UserId, "")
 		if err != nil {
 			logError(err)
 			return nil
 		}
 		// user status
-		status, _, err := m.client.GetUserStatus(user.Id, "")
+		status, _, err := m.client.GetUserStatus(context.TODO(), user.Id, "")
 		if err != nil {
 			logError(err)
 			return nil
@@ -418,7 +419,7 @@ func (m *mattermost) getChannelName(c *model.Channel) string {
 			// with ourselves
 			return m.user.Username
 		}
-		user, _, err := m.client.GetUser(other, "")
+		user, _, err := m.client.GetUser(context.TODO(), other, "")
 		if err != nil {
 			// cannot retrieve username, fallback to id
 			logError(err)
@@ -464,7 +465,7 @@ func (m *mattermost) sendMsg(channel string, msg string) {
 		Message:   msg,
 	}
 
-	if _, _, err := m.client.CreatePost(post); err != nil {
+	if _, _, err := m.client.CreatePost(context.TODO(), post); err != nil {
 		logError(err)
 	}
 }
@@ -500,7 +501,7 @@ func (m *mattermost) getTeamChannels() teamChannels {
 // updateTeamChannels updates the teams and their channels
 func (m *mattermost) updateTeamChannels() bool {
 	// get teams
-	teams, _, err := m.client.GetTeamsForUser(m.user.Id, "")
+	teams, _, err := m.client.GetTeamsForUser(context.TODO(), m.user.Id, "")
 	if err != nil {
 		logError(err)
 		return false
@@ -510,8 +511,8 @@ func (m *mattermost) updateTeamChannels() bool {
 	teamChannels := make(teamChannels)
 	for _, t := range teams {
 		// get channels
-		channels, _, err := m.client.GetChannelsForTeamForUser(t.Id,
-			m.user.Id, false, "")
+		channels, _, err := m.client.GetChannelsForTeamForUser(
+			context.TODO(), t.Id, m.user.Id, false, "")
 		if err != nil {
 			logError(err)
 			return false
@@ -573,7 +574,7 @@ func (m *mattermost) getPostFiles(post *model.Post) string {
 	fileInfo := "---- Attachments:"
 	for _, f := range post.Metadata.Files {
 		// create link for the file
-		link, _, err := m.client.GetFileLink(f.Id)
+		link, _, err := m.client.GetFileLink(context.TODO(), f.Id)
 		if err != nil {
 			logError(err)
 			continue
@@ -610,7 +611,7 @@ func (m *mattermost) handlePost(post *model.Post) {
 	if post.UserId == m.user.Id {
 		username = "<self>"
 	} else {
-		user, _, err := m.client.GetUser(post.UserId, "")
+		user, _, err := m.client.GetUser(context.TODO(), post.UserId, "")
 		if err != nil {
 			logError(err)
 		} else {
@@ -719,8 +720,8 @@ func (m *mattermost) getOldChannelMessages(id string) {
 	postID := m.channels.getPostID(id)
 	for {
 		// get batch of message after last know post id
-		posts, _, err := m.client.GetPostsAfter(id, postID, 0, 60, "",
-			false)
+		posts, _, err := m.client.GetPostsAfter(context.TODO(),
+			id, postID, 0, 60, "", false, true)
 		if err != nil {
 			logError(err)
 			return
@@ -753,7 +754,7 @@ func (m *mattermost) getOldMessages() {
 func (m *mattermost) connect() bool {
 	// login
 	logInfo("Connecting to mattermost server", m.server)
-	user, _, err := m.client.Login(m.username, m.password)
+	user, _, err := m.client.Login(context.TODO(), m.username, m.password)
 	if err != nil {
 		logError(err)
 		return false
