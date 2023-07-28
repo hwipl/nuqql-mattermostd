@@ -73,11 +73,11 @@ func (m *mattermost) splitTeamChannel(name string) (team, channel string) {
 }
 
 // getTeamByID tries to get a team by its ID
-func (m *mattermost) getTeamByID(id string) *model.Team {
+func (m *mattermost) getTeamByID(ctx context.Context, id string) *model.Team {
 	if !model.IsValidId(id) {
 		return nil
 	}
-	t, _, err := m.client.GetTeam(context.TODO(), id, "")
+	t, _, err := m.client.GetTeam(ctx, id, "")
 	if err != nil {
 		return nil
 	}
@@ -85,11 +85,11 @@ func (m *mattermost) getTeamByID(id string) *model.Team {
 }
 
 // getTeamByName tries to get a team by its name
-func (m *mattermost) getTeamByName(name string) *model.Team {
+func (m *mattermost) getTeamByName(ctx context.Context, name string) *model.Team {
 	if !model.IsValidTeamName(name) {
 		return nil
 	}
-	t, _, err := m.client.GetTeamByName(context.TODO(), name, "")
+	t, _, err := m.client.GetTeamByName(ctx, name, "")
 	if err != nil {
 		return nil
 	}
@@ -99,7 +99,7 @@ func (m *mattermost) getTeamByName(name string) *model.Team {
 // getTeam tries to identify a team by name and returns it; name can be a team
 // ID or a team name; if name is empty it returns the first team the current
 // user is in
-func (m *mattermost) getTeam(name string) *model.Team {
+func (m *mattermost) getTeam(ctx context.Context, name string) *model.Team {
 	if name == "" {
 		// no team name given, try to get the first team the user is in
 		teams := []*model.Team{}
@@ -113,20 +113,20 @@ func (m *mattermost) getTeam(name string) *model.Team {
 	}
 
 	// try to find team by id
-	if t := m.getTeamByID(name); t != nil {
+	if t := m.getTeamByID(ctx, name); t != nil {
 		return t
 	}
 
 	// try to find team by name
-	return m.getTeamByName(name)
+	return m.getTeamByName(ctx, name)
 }
 
 // getChannelByID tries to get a channel by its ID
-func (m *mattermost) getChannelByID(id string) *model.Channel {
+func (m *mattermost) getChannelByID(ctx context.Context, id string) *model.Channel {
 	if !model.IsValidId(id) {
 		return nil
 	}
-	c, _, err := m.client.GetChannel(context.TODO(), id, "")
+	c, _, err := m.client.GetChannel(ctx, id, "")
 	if err != nil {
 		return nil
 	}
@@ -134,11 +134,11 @@ func (m *mattermost) getChannelByID(id string) *model.Channel {
 }
 
 // getChannelByName tries to get a channel by its team ID and name
-func (m *mattermost) getChannelByName(teamID, name string) *model.Channel {
+func (m *mattermost) getChannelByName(ctx context.Context, teamID, name string) *model.Channel {
 	if !model.IsValidChannelIdentifier(name) {
 		return nil
 	}
-	c, _, err := m.client.GetChannelByName(context.TODO(), name, teamID, "")
+	c, _, err := m.client.GetChannelByName(ctx, name, teamID, "")
 	if err != nil {
 		return nil
 	}
@@ -147,22 +147,22 @@ func (m *mattermost) getChannelByName(teamID, name string) *model.Channel {
 
 // getChannel tries to identify a channel with teamid by name and returns it;
 // name can be a channel ID or a channel name
-func (m *mattermost) getChannel(teamID, name string) *model.Channel {
+func (m *mattermost) getChannel(ctx context.Context, teamID, name string) *model.Channel {
 	// try to find channel by id
-	if c := m.getChannelByID(name); c != nil {
+	if c := m.getChannelByID(ctx, name); c != nil {
 		return c
 	}
 
 	// try to find channel by name
-	return m.getChannelByName(teamID, name)
+	return m.getChannelByName(ctx, teamID, name)
 }
 
 // getUserByID tries to get a user by its ID
-func (m *mattermost) getUserByID(id string) *model.User {
+func (m *mattermost) getUserByID(ctx context.Context, id string) *model.User {
 	if !model.IsValidId(id) {
 		return nil
 	}
-	u, _, err := m.client.GetUser(context.TODO(), id, "")
+	u, _, err := m.client.GetUser(ctx, id, "")
 	if err != nil {
 		return nil
 	}
@@ -170,11 +170,11 @@ func (m *mattermost) getUserByID(id string) *model.User {
 }
 
 // getUserByEmail tries to get a user by its email address
-func (m *mattermost) getUserByEmail(email string) *model.User {
+func (m *mattermost) getUserByEmail(ctx context.Context, email string) *model.User {
 	if !model.IsValidEmail(email) {
 		return nil
 	}
-	u, _, err := m.client.GetUserByEmail(context.TODO(), email, "")
+	u, _, err := m.client.GetUserByEmail(ctx, email, "")
 	if err != nil {
 		return nil
 	}
@@ -182,11 +182,11 @@ func (m *mattermost) getUserByEmail(email string) *model.User {
 }
 
 // getUserByUsername tries to get a user by its username
-func (m *mattermost) getUserByUsername(username string) *model.User {
+func (m *mattermost) getUserByUsername(ctx context.Context, username string) *model.User {
 	if !model.IsValidUsername(username) {
 		return nil
 	}
-	u, _, err := m.client.GetUserByUsername(context.TODO(), username, "")
+	u, _, err := m.client.GetUserByUsername(ctx, username, "")
 	if err != nil {
 		return nil
 	}
@@ -195,23 +195,23 @@ func (m *mattermost) getUserByUsername(username string) *model.User {
 
 // getUser tries to identify a user by name and returns it; name can be a user
 // ID, email address or a username
-func (m *mattermost) getUser(name string) *model.User {
+func (m *mattermost) getUser(ctx context.Context, name string) *model.User {
 	// try to find user by id
-	if u := m.getUserByID(name); u != nil {
+	if u := m.getUserByID(ctx, name); u != nil {
 		return u
 	}
 
 	// try to find user by email
-	if u := m.getUserByEmail(name); u != nil {
+	if u := m.getUserByEmail(ctx, name); u != nil {
 		return u
 	}
 
 	// try to find user by name
-	return m.getUserByUsername(name)
+	return m.getUserByUsername(ctx, name)
 }
 
 // createChannel creates a channel with name in team
-func (m *mattermost) createChannel(team *model.Team, name string) {
+func (m *mattermost) createChannel(ctx context.Context, team *model.Team, name string) {
 	// create channel
 	c := &model.Channel{
 		DisplayName: name,
@@ -219,7 +219,7 @@ func (m *mattermost) createChannel(team *model.Team, name string) {
 		Type:        model.ChannelTypePrivate,
 		TeamId:      team.Id,
 	}
-	c, _, err := m.client.CreateChannel(context.TODO(), c)
+	c, _, err := m.client.CreateChannel(ctx, c)
 	if err != nil {
 		logError(err)
 	}
@@ -227,7 +227,7 @@ func (m *mattermost) createChannel(team *model.Team, name string) {
 
 // joinChannel joins channel identified by "<team>/<channel>" string
 // in teamChannel
-func (m *mattermost) joinChannel(teamChannel string) {
+func (m *mattermost) joinChannel(ctx context.Context, teamChannel string) {
 	if !m.isOnline() {
 		return
 	}
@@ -236,22 +236,22 @@ func (m *mattermost) joinChannel(teamChannel string) {
 	team, channel := m.splitTeamChannel(teamChannel)
 
 	// get team id
-	t := m.getTeam(team)
+	t := m.getTeam(ctx, team)
 	if t == nil {
 		logError("could not get team:", team, teamChannel)
 		return
 	}
 
 	// check if channel already exists
-	c := m.getChannel(t.Id, channel)
+	c := m.getChannel(ctx, t.Id, channel)
 	if c == nil {
 		// channel does not seem to exist, try to create it
-		m.createChannel(t, channel)
+		m.createChannel(ctx, t, channel)
 		return
 	}
 
 	// channel exist, add current user to channel
-	_, _, err := m.client.AddChannelMember(context.TODO(), c.Id, m.user.Id)
+	_, _, err := m.client.AddChannelMember(ctx, c.Id, m.user.Id)
 	if err != nil {
 		logError(err)
 		return
@@ -259,7 +259,7 @@ func (m *mattermost) joinChannel(teamChannel string) {
 }
 
 // partChannel leaves channel
-func (m *mattermost) partChannel(teamChannel string) {
+func (m *mattermost) partChannel(ctx context.Context, teamChannel string) {
 	if !m.isOnline() {
 		return
 	}
@@ -268,21 +268,21 @@ func (m *mattermost) partChannel(teamChannel string) {
 	team, channel := m.splitTeamChannel(teamChannel)
 
 	// get team id
-	t := m.getTeam(team)
+	t := m.getTeam(ctx, team)
 	if t == nil {
 		logError("could not get team:", team, teamChannel)
 		return
 	}
 
 	// check if channel exists
-	c := m.getChannel(t.Id, channel)
+	c := m.getChannel(ctx, t.Id, channel)
 	if c == nil {
 		logError("could not get channel:", channel, teamChannel)
 		return
 	}
 
 	// remove current user from channel
-	_, err := m.client.RemoveUserFromChannel(context.TODO(), c.Id, m.user.Id)
+	_, err := m.client.RemoveUserFromChannel(ctx, c.Id, m.user.Id)
 	if err != nil {
 		logError(err)
 		return
@@ -290,7 +290,7 @@ func (m *mattermost) partChannel(teamChannel string) {
 }
 
 // addChannel adds user to channel
-func (m *mattermost) addChannel(teamChannel, user string) {
+func (m *mattermost) addChannel(ctx context.Context, teamChannel, user string) {
 	if !m.isOnline() {
 		return
 	}
@@ -299,28 +299,28 @@ func (m *mattermost) addChannel(teamChannel, user string) {
 	team, channel := m.splitTeamChannel(teamChannel)
 
 	// get team id
-	t := m.getTeam(team)
+	t := m.getTeam(ctx, team)
 	if t == nil {
 		logError("could not get team:", team, teamChannel)
 		return
 	}
 
 	// check if channel exists
-	c := m.getChannel(t.Id, channel)
+	c := m.getChannel(ctx, t.Id, channel)
 	if c == nil {
 		logError("could not get channel:", channel, teamChannel)
 		return
 	}
 
 	// get user id
-	u := m.getUser(user)
+	u := m.getUser(ctx, user)
 	if u == nil {
 		logError("could not get user:", user)
 		return
 	}
 
 	// add user to channel
-	_, _, err := m.client.AddChannelMember(context.TODO(), c.Id, u.Id)
+	_, _, err := m.client.AddChannelMember(ctx, c.Id, u.Id)
 	if err != nil {
 		logError(err)
 		return
@@ -328,12 +328,12 @@ func (m *mattermost) addChannel(teamChannel, user string) {
 }
 
 // getStatus returns our status
-func (m *mattermost) getStatus() string {
+func (m *mattermost) getStatus(ctx context.Context) string {
 	if !m.isOnline() {
 		return "offline"
 	}
 
-	status, _, err := m.client.GetUserStatus(context.TODO(), m.user.Id, "")
+	status, _, err := m.client.GetUserStatus(ctx, m.user.Id, "")
 	if err != nil {
 		logError(err)
 		return ""
@@ -342,7 +342,7 @@ func (m *mattermost) getStatus() string {
 }
 
 // setStatus sets our status
-func (m *mattermost) setStatus(status string) {
+func (m *mattermost) setStatus(ctx context.Context, status string) {
 	if !m.isOnline() {
 		return
 	}
@@ -363,14 +363,14 @@ func (m *mattermost) setStatus(status string) {
 		UserId: m.user.Id,
 		Status: status,
 	}
-	_, _, err := m.client.UpdateUserStatus(context.TODO(), m.user.Id, &s)
+	_, _, err := m.client.UpdateUserStatus(ctx, m.user.Id, &s)
 	if err != nil {
 		logError(err)
 	}
 }
 
 // getChannelUsers returns a list of users in channel
-func (m *mattermost) getChannelUsers(channel string) []*buddy {
+func (m *mattermost) getChannelUsers(ctx context.Context, channel string) []*buddy {
 	var buddies []*buddy
 
 	if !m.isOnline() {
@@ -378,7 +378,7 @@ func (m *mattermost) getChannelUsers(channel string) []*buddy {
 	}
 
 	// retrieve channel members
-	members, _, err := m.client.GetChannelMembers(context.TODO(), channel, 0, 60, "")
+	members, _, err := m.client.GetChannelMembers(ctx, channel, 0, 60, "")
 	if err != nil {
 		logError(err)
 		return nil
@@ -387,13 +387,13 @@ func (m *mattermost) getChannelUsers(channel string) []*buddy {
 	// try to get user information of channel members
 	for _, member := range members {
 		// user name
-		user, _, err := m.client.GetUser(context.TODO(), member.UserId, "")
+		user, _, err := m.client.GetUser(ctx, member.UserId, "")
 		if err != nil {
 			logError(err)
 			return nil
 		}
 		// user status
-		status, _, err := m.client.GetUserStatus(context.TODO(), user.Id, "")
+		status, _, err := m.client.GetUserStatus(ctx, user.Id, "")
 		if err != nil {
 			logError(err)
 			return nil
@@ -408,7 +408,7 @@ func (m *mattermost) getChannelUsers(channel string) []*buddy {
 }
 
 // getChannelName returns the name of the channel c
-func (m *mattermost) getChannelName(c *model.Channel) string {
+func (m *mattermost) getChannelName(ctx context.Context, c *model.Channel) string {
 	// direct channels do not seem to set a display name; construct a name
 	// from the other user's username
 	if c.Type == model.ChannelTypeDirect {
@@ -419,7 +419,7 @@ func (m *mattermost) getChannelName(c *model.Channel) string {
 			// with ourselves
 			return m.user.Username
 		}
-		user, _, err := m.client.GetUser(context.TODO(), other, "")
+		user, _, err := m.client.GetUser(ctx, other, "")
 		if err != nil {
 			// cannot retrieve username, fallback to id
 			logError(err)
@@ -455,7 +455,7 @@ func (m *mattermost) getBuddies() []*buddy {
 }
 
 // sendMsg sends a message to channel
-func (m *mattermost) sendMsg(channel string, msg string) {
+func (m *mattermost) sendMsg(ctx context.Context, channel string, msg string) {
 	if !m.isOnline() {
 		return
 	}
@@ -465,7 +465,7 @@ func (m *mattermost) sendMsg(channel string, msg string) {
 		Message:   msg,
 	}
 
-	if _, _, err := m.client.CreatePost(context.TODO(), post); err != nil {
+	if _, _, err := m.client.CreatePost(ctx, post); err != nil {
 		logError(err)
 	}
 }
@@ -499,9 +499,9 @@ func (m *mattermost) getTeamChannels() teamChannels {
 }
 
 // updateTeamChannels updates the teams and their channels
-func (m *mattermost) updateTeamChannels() bool {
+func (m *mattermost) updateTeamChannels(ctx context.Context) bool {
 	// get teams
-	teams, _, err := m.client.GetTeamsForUser(context.TODO(), m.user.Id, "")
+	teams, _, err := m.client.GetTeamsForUser(ctx, m.user.Id, "")
 	if err != nil {
 		logError(err)
 		return false
@@ -512,7 +512,7 @@ func (m *mattermost) updateTeamChannels() bool {
 	for _, t := range teams {
 		// get channels
 		channels, _, err := m.client.GetChannelsForTeamForUser(
-			context.TODO(), t.Id, m.user.Id, false, "")
+			ctx, t.Id, m.user.Id, false, "")
 		if err != nil {
 			logError(err)
 			return false
@@ -520,7 +520,7 @@ func (m *mattermost) updateTeamChannels() bool {
 
 		for _, c := range channels {
 			// get name of the channel
-			name := m.getChannelName(c) +
+			name := m.getChannelName(ctx, c) +
 				" (" + t.DisplayName + ")"
 			tc := &teamChannel{c, name}
 
@@ -564,7 +564,7 @@ func (m *mattermost) getHistory() {
 }
 
 // getPostFiles returns the files attached to post as a string
-func (m *mattermost) getPostFiles(post *model.Post) string {
+func (m *mattermost) getPostFiles(ctx context.Context, post *model.Post) string {
 	// return empty string if there are no files attached
 	if len(post.Metadata.Files) == 0 {
 		return ""
@@ -574,7 +574,7 @@ func (m *mattermost) getPostFiles(post *model.Post) string {
 	fileInfo := "---- Attachments:"
 	for _, f := range post.Metadata.Files {
 		// create link for the file
-		link, _, err := m.client.GetFileLink(context.TODO(), f.Id)
+		link, _, err := m.client.GetFileLink(ctx, f.Id)
 		if err != nil {
 			logError(err)
 			continue
@@ -589,7 +589,7 @@ func (m *mattermost) getPostFiles(post *model.Post) string {
 }
 
 // handlePost handles the post
-func (m *mattermost) handlePost(post *model.Post) {
+func (m *mattermost) handlePost(ctx context.Context, post *model.Post) {
 	// filter own messages
 	if post.UserId == m.user.Id && m.filterOwn {
 		return
@@ -597,7 +597,7 @@ func (m *mattermost) handlePost(post *model.Post) {
 
 	// construct message text including attached files
 	text := post.Message
-	if fileInfo := m.getPostFiles(post); fileInfo != "" {
+	if fileInfo := m.getPostFiles(ctx, post); fileInfo != "" {
 		if text != "" {
 			text += "\n\n"
 		}
@@ -611,7 +611,7 @@ func (m *mattermost) handlePost(post *model.Post) {
 	if post.UserId == m.user.Id {
 		username = "<self>"
 	} else {
-		user, _, err := m.client.GetUser(context.TODO(), post.UserId, "")
+		user, _, err := m.client.GetUser(ctx, post.UserId, "")
 		if err != nil {
 			logError(err)
 		} else {
@@ -650,18 +650,18 @@ func (m *mattermost) handleRemoved(event *model.WebSocketEvent) {
 }
 
 // handleTeamChannelChange handles team and channel change events
-func (m *mattermost) handleTeamChannelChange(event *model.WebSocketEvent) {
+func (m *mattermost) handleTeamChannelChange(ctx context.Context, event *model.WebSocketEvent) {
 	// handle removed events
 	if event.EventType() == model.WebsocketEventUserRemoved {
 		m.handleRemoved(event)
 	}
 
 	// update teams and channels
-	m.updateTeamChannels()
+	m.updateTeamChannels(ctx)
 }
 
 // handleWebSocketEvent handles events from the websocket
-func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
+func (m *mattermost) handleWebSocketEvent(ctx context.Context, event *model.WebSocketEvent) {
 	// check if event is valid
 	if event == nil {
 		return
@@ -677,7 +677,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		model.WebsocketEventUpdateTeam,
 		model.WebsocketEventDeleteTeam,
 		model.WebsocketEventRestoreTeam:
-		m.handleTeamChannelChange(event)
+		m.handleTeamChannelChange(ctx, event)
 		return
 
 	// handle channel change events
@@ -686,7 +686,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		model.WebsocketEventChannelDeleted,
 		model.WebsocketEventChannelUpdated,
 		model.WebsocketEventChannelMemberUpdated:
-		m.handleTeamChannelChange(event)
+		m.handleTeamChannelChange(ctx, event)
 		return
 
 	// hande user change events
@@ -695,7 +695,7 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 		model.WebsocketEventUserRoleUpdated,
 		model.WebsocketEventMemberroleUpdated,
 		model.WebsocketEventUserRemoved:
-		m.handleTeamChannelChange(event)
+		m.handleTeamChannelChange(ctx, event)
 		return
 	}
 
@@ -709,18 +709,18 @@ func (m *mattermost) handleWebSocketEvent(event *model.WebSocketEvent) {
 	data := strings.NewReader(event.GetData()["post"].(string))
 	json.NewDecoder(data).Decode(&post)
 	if post != nil {
-		m.handlePost(post)
+		m.handlePost(ctx, post)
 	}
 }
 
 // getOldChannelMessages retrieves old/unread messages of the channel
 // identified by id
-func (m *mattermost) getOldChannelMessages(id string) {
+func (m *mattermost) getOldChannelMessages(ctx context.Context, id string) {
 	// get last known post id of channel
 	postID := m.channels.getPostID(id)
 	for {
 		// get batch of message after last know post id
-		posts, _, err := m.client.GetPostsAfter(context.TODO(),
+		posts, _, err := m.client.GetPostsAfter(ctx,
 			id, postID, 0, 60, "", false, true)
 		if err != nil {
 			logError(err)
@@ -730,7 +730,7 @@ func (m *mattermost) getOldChannelMessages(id string) {
 		// reverse message order
 		for i := len(posts.Order) - 1; i >= 0; i-- {
 			p := posts.Order[i]
-			m.handlePost(posts.Posts[p])
+			m.handlePost(ctx, posts.Posts[p])
 			postID = p
 
 		}
@@ -741,20 +741,20 @@ func (m *mattermost) getOldChannelMessages(id string) {
 }
 
 // getOldMessages retrieves old/unread messages
-func (m *mattermost) getOldMessages() {
+func (m *mattermost) getOldMessages(ctx context.Context) {
 	for _, teamChannels := range m.getTeamChannels() {
 		// get messages in each channel
 		for _, tc := range teamChannels {
-			m.getOldChannelMessages(tc.channel.Id)
+			m.getOldChannelMessages(ctx, tc.channel.Id)
 		}
 	}
 }
 
 // connect connects to a mattermost server
-func (m *mattermost) connect() bool {
+func (m *mattermost) connect(ctx context.Context) bool {
 	// login
 	logInfo("Connecting to mattermost server", m.server)
-	user, _, err := m.client.Login(context.TODO(), m.username, m.password)
+	user, _, err := m.client.Login(ctx, m.username, m.password)
 	if err != nil {
 		logError(err)
 		return false
@@ -763,12 +763,12 @@ func (m *mattermost) connect() bool {
 	m.user = user
 
 	// update teams and channels
-	if !m.updateTeamChannels() {
+	if !m.updateTeamChannels(ctx) {
 		return false
 	}
 
 	// retrieve unread messages
-	m.getOldMessages()
+	m.getOldMessages(ctx)
 
 	// create websocket and start listening for events
 	websock, err := model.NewWebSocketClient4(m.webSocketPrefix+m.server,
@@ -784,7 +784,7 @@ func (m *mattermost) connect() bool {
 }
 
 // loop runs the main loop of the mattermost client handling websocket events
-func (m *mattermost) loop() bool {
+func (m *mattermost) loop(ctx context.Context) bool {
 	defer m.websock.Close()
 
 	// handle websocket events
@@ -803,7 +803,7 @@ func (m *mattermost) loop() bool {
 			}
 
 			// handle event
-			m.handleWebSocketEvent(event)
+			m.handleWebSocketEvent(ctx, event)
 		case <-m.websock.PingTimeoutChannel:
 			logError("websocket ping timeout")
 		case <-m.done:
@@ -813,10 +813,10 @@ func (m *mattermost) loop() bool {
 }
 
 // run starts the mattermost client
-func (m *mattermost) run() {
+func (m *mattermost) run(ctx context.Context) {
 	for {
 		// try to (re)connect to the server
-		for !m.connect() {
+		for !m.connect(ctx) {
 			select {
 			case <-time.After(15 * time.Second):
 				// wait before reconnecting
@@ -827,7 +827,7 @@ func (m *mattermost) run() {
 
 		// connection established, run main loop until we are done;
 		// if there is an error, reconnect to the server
-		if m.loop() {
+		if m.loop(ctx) {
 			return
 		}
 	}

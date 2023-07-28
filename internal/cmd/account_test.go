@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"io/ioutil"
 	"log"
 	"os"
@@ -32,7 +33,7 @@ func TestSplitAccountUser(t *testing.T) {
 func TestAccountStart(t *testing.T) {
 	// test dummy account
 	a := account{}
-	a.start()
+	a.start(context.Background())
 }
 
 func TestAccountStop(t *testing.T) {
@@ -176,7 +177,7 @@ func TestAddAccount(t *testing.T) {
 	protocol := "test"
 	user := "testuser"
 	password := "testpasswd"
-	id := addAccount(protocol, user, password)
+	id := addAccount(context.Background(), protocol, user, password)
 	a := getAccount(id)
 
 	// test id
@@ -214,7 +215,7 @@ func TestDelAccount(t *testing.T) {
 	conf.Dir = dir
 
 	// add dummy account
-	id := addAccount("test", "testuser", "testpasswd")
+	id := addAccount(context.Background(), "test", "testuser", "testpasswd")
 
 	// test deleting dummy account
 	delAccount(id)
@@ -243,7 +244,7 @@ func TestReadAccountsFromFile(t *testing.T) {
 	protocol := "test"
 	user := "testuser"
 	password := "testpasswd"
-	id := addAccount(protocol, user, password)
+	id := addAccount(context.Background(), protocol, user, password)
 
 	// reset accounts
 	accounts = make(map[int]*account)
@@ -287,14 +288,15 @@ func TestStartStopAccounts(t *testing.T) {
 	conf.Dir = dir
 
 	// add dummy accounts
-	addAccount("test", "testuser1", "testpasswd1")
-	addAccount("test", "testuser2", "testpasswd2")
-	addAccount("test", "testuser3", "testpasswd3")
+	ctx := context.Background()
+	addAccount(ctx, "test", "testuser1", "testpasswd1")
+	addAccount(ctx, "test", "testuser2", "testpasswd2")
+	addAccount(ctx, "test", "testuser3", "testpasswd3")
 
 	// reset accounts
 	accounts = make(map[int]*account)
 
 	// test starting and stopping dummy accounts
-	startAccounts()
+	startAccounts(ctx)
 	stopAccounts()
 }

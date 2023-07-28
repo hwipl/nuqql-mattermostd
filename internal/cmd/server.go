@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"html"
 	"net"
@@ -124,7 +125,7 @@ func (s *server) handleAccountList() {
 }
 
 // handleAccountAdd handles an account add command
-func (s *server) handleAccountAdd(parts []string) {
+func (s *server) handleAccountAdd(ctx context.Context, parts []string) {
 	// expected command format:
 	// account add <protocol> <user> <password>
 	if len(parts) < 5 {
@@ -133,7 +134,7 @@ func (s *server) handleAccountAdd(parts []string) {
 	protocol := parts[2]
 	user := parts[3]
 	password := parts[4]
-	id := addAccount(protocol, user, password)
+	id := addAccount(ctx, protocol, user, password)
 	logInfo("added new account with id:", id)
 
 	// optional reply:
@@ -180,7 +181,7 @@ func unescapeMessage(msg string) string {
 }
 
 // handleAccountSend handles an account send command
-func (s *server) handleAccountSend(a *account, parts []string) {
+func (s *server) handleAccountSend(ctx context.Context, a *account, parts []string) {
 	// account <id> send <user> <msg>
 	if len(parts) < 5 {
 		return
@@ -188,13 +189,13 @@ func (s *server) handleAccountSend(a *account, parts []string) {
 	channel := parts[3]
 	msg := strings.Join(parts[4:], " ")
 	logDebug("sending message to channel "+channel+":", msg)
-	a.client.sendMsg(channel, unescapeMessage(msg))
+	a.client.sendMsg(ctx, channel, unescapeMessage(msg))
 }
 
 // handleAccountStatusGet handles an account status get command
-func (s *server) handleAccountStatusGet(a *account) {
+func (s *server) handleAccountStatusGet(ctx context.Context, a *account) {
 	// account <id> status get
-	status := a.client.getStatus()
+	status := a.client.getStatus(ctx)
 	if status == "" {
 		return
 	}
@@ -206,7 +207,7 @@ func (s *server) handleAccountStatusGet(a *account) {
 }
 
 // handleAccountStatusSet handles an account status set command
-func (s *server) handleAccountStatusSet(a *account, parts []string) {
+func (s *server) handleAccountStatusSet(ctx context.Context, a *account, parts []string) {
 	// account <id> status set <status>
 	if len(parts) < 5 {
 		return
@@ -214,11 +215,11 @@ func (s *server) handleAccountStatusSet(a *account, parts []string) {
 
 	// try to set status
 	status := parts[4]
-	a.client.setStatus(status)
+	a.client.setStatus(ctx, status)
 }
 
 // handleAccountStatus handles an account status command
-func (s *server) handleAccountStatus(a *account, parts []string) {
+func (s *server) handleAccountStatus(ctx context.Context, a *account, parts []string) {
 	// status commands have at least 4 parts
 	if len(parts) < 4 {
 		return
@@ -227,9 +228,9 @@ func (s *server) handleAccountStatus(a *account, parts []string) {
 	// handle status commands
 	switch parts[3] {
 	case "get":
-		s.handleAccountStatusGet(a)
+		s.handleAccountStatusGet(ctx, a)
 	case "set":
-		s.handleAccountStatusSet(a, parts)
+		s.handleAccountStatusSet(ctx, a, parts)
 	}
 }
 
@@ -245,29 +246,29 @@ func (s *server) handleAccountChatList(a *account) {
 }
 
 // handleAccountChatJoin handles an account chat join command
-func (s *server) handleAccountChatJoin(a *account, parts []string) {
+func (s *server) handleAccountChatJoin(ctx context.Context, a *account, parts []string) {
 	// account <id> chat join <chat>
 	if len(parts) < 5 {
 		return
 	}
 	channel := parts[4]
 	logInfo("joining channel " + channel)
-	a.client.joinChannel(channel)
+	a.client.joinChannel(ctx, channel)
 }
 
 // handleAccountChatPart handles an account chat part command
-func (s *server) handleAccountChatPart(a *account, parts []string) {
+func (s *server) handleAccountChatPart(ctx context.Context, a *account, parts []string) {
 	// account <id> chat part <chat>
 	if len(parts) < 5 {
 		return
 	}
 	channel := parts[4]
 	logInfo("leaving channel " + channel)
-	a.client.partChannel(channel)
+	a.client.partChannel(ctx, channel)
 }
 
 // handleAccountChatSend handles an account chat send command
-func (s *server) handleAccountChatSend(a *account, parts []string) {
+func (s *server) handleAccountChatSend(ctx context.Context, a *account, parts []string) {
 	// account <id> chat send <chat> <msg>
 	if len(parts) < 6 {
 		return
@@ -275,18 +276,18 @@ func (s *server) handleAccountChatSend(a *account, parts []string) {
 	channel := parts[4]
 	msg := strings.Join(parts[5:], " ")
 	logDebug("sending message to channel "+channel+":", msg)
-	a.client.sendMsg(channel, unescapeMessage(msg))
+	a.client.sendMsg(ctx, channel, unescapeMessage(msg))
 }
 
 // handleAccountChat handles an account chat users command
-func (s *server) handleAccountChatUsers(a *account, parts []string) {
+func (s *server) handleAccountChatUsers(ctx context.Context, a *account, parts []string) {
 	// account <id> chat users <chat>
 	if len(parts) < 5 {
 		return
 	}
 
 	channel := parts[4]
-	users := a.client.getChannelUsers(channel)
+	users := a.client.getChannelUsers(ctx, channel)
 	for _, u := range users {
 		// create and send message with format:
 		// chat: user: <acc_id> <chat> <name> <alias> <state>
@@ -298,7 +299,7 @@ func (s *server) handleAccountChatUsers(a *account, parts []string) {
 }
 
 // handleAccountChatInvite handles an account chat invite command
-func (s *server) handleAccountChatInvite(a *account, parts []string) {
+func (s *server) handleAccountChatInvite(ctx context.Context, a *account, parts []string) {
 	// account <id> chat invite <chat> <user>
 	if len(parts) < 6 {
 		return
@@ -307,11 +308,11 @@ func (s *server) handleAccountChatInvite(a *account, parts []string) {
 	channel := parts[4]
 	user := parts[5]
 	logInfo("adding " + user + " to channel " + channel)
-	a.client.addChannel(channel, user)
+	a.client.addChannel(ctx, channel, user)
 }
 
 // handleAccountChat handles an account chat command
-func (s *server) handleAccountChat(a *account, parts []string) {
+func (s *server) handleAccountChat(ctx context.Context, a *account, parts []string) {
 	// chat commands have at least 4 parts
 	if len(parts) < 4 {
 		return
@@ -322,20 +323,20 @@ func (s *server) handleAccountChat(a *account, parts []string) {
 	case "list":
 		s.handleAccountChatList(a)
 	case "join":
-		s.handleAccountChatJoin(a, parts)
+		s.handleAccountChatJoin(ctx, a, parts)
 	case "part":
-		s.handleAccountChatPart(a, parts)
+		s.handleAccountChatPart(ctx, a, parts)
 	case "send":
-		s.handleAccountChatSend(a, parts)
+		s.handleAccountChatSend(ctx, a, parts)
 	case "users":
-		s.handleAccountChatUsers(a, parts)
+		s.handleAccountChatUsers(ctx, a, parts)
 	case "invite":
-		s.handleAccountChatInvite(a, parts)
+		s.handleAccountChatInvite(ctx, a, parts)
 	}
 }
 
 // handleAccountCommand handles an account command received from the client
-func (s *server) handleAccountCommand(parts []string) {
+func (s *server) handleAccountCommand(ctx context.Context, parts []string) {
 	// account commands consist of at least 2 parts
 	if len(parts) < 2 {
 		return
@@ -348,7 +349,7 @@ func (s *server) handleAccountCommand(parts []string) {
 		return
 	}
 	if parts[1] == "add" {
-		s.handleAccountAdd(parts)
+		s.handleAccountAdd(ctx, parts)
 		return
 	}
 
@@ -378,11 +379,11 @@ func (s *server) handleAccountCommand(parts []string) {
 	case "collect":
 		s.handleAccountCollect(a)
 	case "send":
-		s.handleAccountSend(a, parts)
+		s.handleAccountSend(ctx, a, parts)
 	case "status":
-		s.handleAccountStatus(a, parts)
+		s.handleAccountStatus(ctx, a, parts)
 	case "chat":
-		s.handleAccountChat(a, parts)
+		s.handleAccountChat(ctx, a, parts)
 	}
 }
 
@@ -394,13 +395,13 @@ func (s *server) handleVersionCommand() {
 }
 
 // handleCommand handles a command received from the client
-func (s *server) handleCommand(cmd string) {
+func (s *server) handleCommand(ctx context.Context, cmd string) {
 	logDebug("client:", cmd)
 
 	parts := strings.Split(cmd, " ")
 	switch parts[0] {
 	case "account":
-		s.handleAccountCommand(parts)
+		s.handleAccountCommand(ctx, parts)
 	case "version":
 		s.handleVersionCommand()
 	case "bye":
@@ -459,6 +460,7 @@ func (s *server) handleClient() {
 	// start client command handling loop
 	r := bufio.NewReader(s.conn)
 	c := ""
+	ctx := context.Background()
 	for s.clientActive {
 		// read a cmd line from the client
 		cmd, err := r.ReadString('\n')
@@ -470,7 +472,7 @@ func (s *server) handleClient() {
 		// read and concatenate cmd lines until "\r\n"
 		c += cmd
 		if len(c) >= 2 && c[len(c)-2] == '\r' {
-			s.handleCommand(c[:len(c)-2])
+			s.handleCommand(ctx, c[:len(c)-2])
 			c = ""
 		}
 	}

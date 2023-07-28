@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"os"
@@ -35,7 +36,7 @@ func (a *account) splitAccountUser() (username, server string) {
 }
 
 // start starts the client for this account
-func (a *account) start() {
+func (a *account) start(ctx context.Context) {
 	// skip non-mattermost accounts
 	if a.Protocol != "mattermost" {
 		return
@@ -47,7 +48,7 @@ func (a *account) start() {
 	// start client
 	logInfo("Starting account", a.ID)
 	a.client = newClient(conf, a.ID, server, user, a.Password)
-	go a.client.run()
+	go a.client.run(ctx)
 }
 
 // stop shuts down the client for this account
@@ -94,7 +95,7 @@ func getFreeAccountID() int {
 
 // addAccount adds a new account with protocol, user and password and returns
 // the new account's ID
-func addAccount(protocol, user, password string) int {
+func addAccount(ctx context.Context, protocol, user, password string) int {
 	a := account{
 		ID:       getFreeAccountID(),
 		Protocol: protocol,
@@ -103,7 +104,7 @@ func addAccount(protocol, user, password string) int {
 	}
 	accounts[a.ID] = &a
 	writeAccountsToFile()
-	a.start()
+	a.start(ctx)
 	return a.ID
 }
 
@@ -172,11 +173,11 @@ func writeAccountsToFile() {
 }
 
 // startAccounts initializes all accounts and starts their clients
-func startAccounts() {
+func startAccounts(ctx context.Context) {
 	// read accounts
 	readAccountsFromFile()
 	for _, a := range accounts {
-		a.start()
+		a.start(ctx)
 	}
 }
 

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -99,7 +100,7 @@ func Run() {
 	initClientQueue()
 
 	// start accounts and client connections
-	startAccounts()
+	startAccounts(context.Background())
 
 	// start server
 	runServer()
