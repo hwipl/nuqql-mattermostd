@@ -1,8 +1,8 @@
 # nuqql-mattermostd
 
 nuqql-mattermostd is a network daemon that implements the nuqql interface and
-uses the [Mattermost Golang
-Driver](https://github.com/mattermost/mattermost-server/blob/master/model/client4.go)
+uses the [Mattermost Public Server
+API](https://github.com/mattermost/mattermost/blob/master/server/public/model/client4.go)
 to connect to Mattermost servers. It can be used as a backend for
 [nuqql](https://github.com/hwipl/nuqql) or as a standalone chat client daemon.
 
