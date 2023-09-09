@@ -2,7 +2,7 @@ module github.com/hwipl/nuqql-mattermostd
 
 go 1.21
 
-require github.com/mattermost/mattermost/server/public v0.0.8
+require github.com/mattermost/mattermost/server/public v0.0.9
 
 require (
 	github.com/blang/semver/v4 v4.0.0 // indirect
@@ -25,9 +25,9 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/wiggin77/merror v1.0.5 // indirect
 	github.com/wiggin77/srslog v1.0.1 // indirect
-	golang.org/x/crypto v0.12.0 // indirect
-	golang.org/x/net v0.14.0 // indirect
-	golang.org/x/text v0.12.0 // indirect
+	golang.org/x/crypto v0.13.0 // indirect
+	golang.org/x/net v0.15.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
