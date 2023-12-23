@@ -2,7 +2,7 @@ module github.com/hwipl/nuqql-mattermostd
 
 go 1.21
 
-require github.com/mattermost/mattermost/server/public v0.0.11
+require github.com/mattermost/mattermost/server/public v0.0.12
 
 require (
 	github.com/blang/semver/v4 v4.0.0 // indirect
