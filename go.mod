@@ -1,6 +1,6 @@
 module github.com/hwipl/nuqql-mattermostd
 
-go 1.21
+go 1.22
 
 require github.com/mattermost/mattermost/server/public v0.0.18
 
