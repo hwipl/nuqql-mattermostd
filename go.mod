@@ -2,7 +2,7 @@ module github.com/hwipl/nuqql-mattermostd
 
 go 1.24.5
 
-require github.com/mattermost/mattermost/server/public v0.1.18
+require github.com/mattermost/mattermost/server/public v0.1.19
 
 require (
 	github.com/blang/semver/v4 v4.0.0 // indirect
@@ -21,6 +21,7 @@ require (
 	github.com/mattermost/go-i18n v1.11.1-0.20211013152124-5c415071e404 // indirect
 	github.com/mattermost/ldap v0.0.0-20231116144001-0f480c025956 // indirect
 	github.com/mattermost/logr/v2 v2.0.22 // indirect
+	github.com/mattermost/mattermost/server/v8 v8.0.0-20250915185843-d1b7ccc454f8 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/oklog/run v1.2.0 // indirect
@@ -35,12 +36,12 @@ require (
 	github.com/wiggin77/srslog v1.0.1 // indirect
 	golang.org/x/crypto v0.42.0 // indirect
 	golang.org/x/mod v0.28.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/net v0.44.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
 	golang.org/x/text v0.29.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250908214217-97024824d090 // indirect
-	google.golang.org/grpc v1.75.0 // indirect
-	google.golang.org/protobuf v1.36.8 // indirect
+	google.golang.org/grpc v1.75.1 // indirect
+	google.golang.org/protobuf v1.36.9 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
