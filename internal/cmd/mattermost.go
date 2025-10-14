@@ -754,7 +754,9 @@ func (m *mattermost) getOldMessages(ctx context.Context) {
 func (m *mattermost) connect(ctx context.Context) bool {
 	// login
 	logInfo("Connecting to mattermost server", m.server)
-	user, _, err := m.client.Login(ctx, m.username, m.password)
+	ctxLogin, cancelLogin := context.WithTimeout(ctx, 30*time.Second)
+	defer cancelLogin()
+	user, _, err := m.client.Login(ctxLogin, m.username, m.password)
 	if err != nil {
 		logError(err)
 		return false
@@ -763,12 +765,16 @@ func (m *mattermost) connect(ctx context.Context) bool {
 	m.user = user
 
 	// update teams and channels
-	if !m.updateTeamChannels(ctx) {
+	ctxTeams, cancelTeams := context.WithTimeout(ctx, time.Minute)
+	defer cancelTeams()
+	if !m.updateTeamChannels(ctxTeams) {
 		return false
 	}
 
 	// retrieve unread messages
-	m.getOldMessages(ctx)
+	ctxMsgs, cancelMsgs := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancelMsgs()
+	m.getOldMessages(ctxMsgs)
 
 	// create websocket and start listening for events
 	websock, err := model.NewWebSocketClient4(m.webSocketPrefix+m.server,
