@@ -6,8 +6,7 @@ import (
 
 func TestChannelsGetPostID(t *testing.T) {
 	// configure working directory
-	dir := createTestWorkDir()
-	defer removeTestWorkDir(dir)
+	dir := t.TempDir()
 	conf.Dir = dir
 
 	// create channels
@@ -31,8 +30,7 @@ func TestChannelsGetPostID(t *testing.T) {
 
 func TestChannelsUpdatePostID(t *testing.T) {
 	// configure working directory
-	dir := createTestWorkDir()
-	defer removeTestWorkDir(dir)
+	dir := t.TempDir()
 	conf.Dir = dir
 
 	// create channels
@@ -57,8 +55,7 @@ func TestChannelsUpdatePostID(t *testing.T) {
 
 func TestChannelsDeleteChannel(t *testing.T) {
 	// configure working directory
-	dir := createTestWorkDir()
-	defer removeTestWorkDir(dir)
+	dir := t.TempDir()
 	conf.Dir = dir
 
 	// create channels
@@ -92,8 +89,7 @@ func TestChannelsDeleteChannel(t *testing.T) {
 
 func TestChannelsReadFromFile(t *testing.T) {
 	// configure working directory
-	dir := createTestWorkDir()
-	defer removeTestWorkDir(dir)
+	dir := t.TempDir()
 	conf.Dir = dir
 
 	// create channels

@@ -72,8 +72,7 @@ func writeTestConfigFile(dir, content string) {
 
 func TestReadFromFile(t *testing.T) {
 	c := NewConfig("testConfig")
-	dir := createTestWorkDir()
-	defer removeTestWorkDir(dir)
+	dir := t.TempDir()
 	c.Dir = dir
 
 	// test with no config file

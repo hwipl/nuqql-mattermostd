@@ -1,14 +1,13 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"testing"
 )
 
 func setTestLogFile() {
-	f, err := ioutil.TempFile("", "testlogfile*")
+	f, err := os.CreateTemp("", "testlogfile*")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,7 +26,7 @@ func unsetTestLogFile() {
 }
 
 func readTestLogFile() string {
-	data, err := ioutil.ReadFile(loggingFile.Name())
+	data, err := os.ReadFile(loggingFile.Name())
 	if err != nil {
 		log.Fatal(err)
 	}

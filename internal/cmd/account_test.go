@@ -2,9 +2,6 @@ package cmd
 
 import (
 	"context"
-	"io/ioutil"
-	"log"
-	"os"
 	"reflect"
 	"testing"
 )
@@ -146,20 +143,6 @@ func TestGetFreeAccountID(t *testing.T) {
 	}
 }
 
-func createTestWorkDir() string {
-	dir, err := ioutil.TempDir("", "nuqql-mattermostd-test")
-	if err != nil {
-		log.Fatal(err)
-	}
-	return dir
-}
-
-func removeTestWorkDir(dir string) {
-	if err := os.RemoveAll(dir); err != nil {
-		log.Fatal(err)
-	}
-}
-
 func TestAddAccount(t *testing.T) {
 	// reset accounts
 	accounts = make(map[int]*account)
@@ -169,8 +152,7 @@ func TestAddAccount(t *testing.T) {
 	}()
 
 	// configure working directory
-	dir := createTestWorkDir()
-	defer removeTestWorkDir(dir)
+	dir := t.TempDir()
 	conf.Dir = dir
 
 	// add dummy account
@@ -210,8 +192,7 @@ func TestDelAccount(t *testing.T) {
 	}()
 
 	// configure working directory
-	dir := createTestWorkDir()
-	defer removeTestWorkDir(dir)
+	dir := t.TempDir()
 	conf.Dir = dir
 
 	// add dummy account
@@ -236,8 +217,7 @@ func TestReadAccountsFromFile(t *testing.T) {
 	}()
 
 	// configure working directory
-	dir := createTestWorkDir()
-	defer removeTestWorkDir(dir)
+	dir := t.TempDir()
 	conf.Dir = dir
 
 	// add dummy account
@@ -283,8 +263,7 @@ func TestStartStopAccounts(t *testing.T) {
 	}()
 
 	// configure working directory
-	dir := createTestWorkDir()
-	defer removeTestWorkDir(dir)
+	dir := t.TempDir()
 	conf.Dir = dir
 
 	// add dummy accounts
