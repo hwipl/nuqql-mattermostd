@@ -20,36 +20,36 @@ var (
 )
 
 // log writes message to the log
-func writeLog(level int, prefix string, v ...interface{}) {
+func writeLog(level int, prefix string, v ...any) {
 	if level < loggingLevel {
 		return
 	}
-	v = append([]interface{}{prefix}, v...)
+	v = append([]any{prefix}, v...)
 	log.Println(v...)
 }
 
 // logDebug logs a debugging message
-func logDebug(v ...interface{}) {
+func logDebug(v ...any) {
 	writeLog(loggingLevelDebug, "DEBUG:", v...)
 }
 
 // logInfo logs an info message
-func logInfo(v ...interface{}) {
+func logInfo(v ...any) {
 	writeLog(loggingLevelInfo, "INFO:", v...)
 }
 
 // logWarn logs a warning message
-func logWarn(v ...interface{}) {
+func logWarn(v ...any) {
 	writeLog(loggingLevelWarn, "WARN:", v...)
 }
 
 // logError logs an error message
-func logError(v ...interface{}) {
+func logError(v ...any) {
 	writeLog(loggingLevelError, "ERROR:", v...)
 }
 
 // logFatal logs an error message and terminates the program
-func logFatal(v ...interface{}) {
+func logFatal(v ...any) {
 	logError(v...)
 	os.Exit(1)
 }
