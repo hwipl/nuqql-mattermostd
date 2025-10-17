@@ -707,7 +707,10 @@ func (m *mattermost) handleWebSocketEvent(ctx context.Context, event *model.WebS
 	// handle post
 	var post *model.Post
 	data := strings.NewReader(event.GetData()["post"].(string))
-	json.NewDecoder(data).Decode(&post)
+	if err := json.NewDecoder(data).Decode(&post); err != nil {
+		logError(err)
+		return
+	}
 	if post != nil {
 		m.handlePost(ctx, post)
 	}
