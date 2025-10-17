@@ -219,7 +219,7 @@ func (m *mattermost) createChannel(ctx context.Context, team *model.Team, name s
 		Type:        model.ChannelTypePrivate,
 		TeamId:      team.Id,
 	}
-	c, _, err := m.client.CreateChannel(ctx, c)
+	_, _, err := m.client.CreateChannel(ctx, c)
 	if err != nil {
 		logError(err)
 	}
