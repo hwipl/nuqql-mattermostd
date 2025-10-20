@@ -27,13 +27,13 @@ func TestSplitAccountUser(t *testing.T) {
 	}
 }
 
-func TestAccountStart(t *testing.T) {
+func TestAccountStart(_ *testing.T) {
 	// test dummy account
 	a := account{}
 	a.start(context.Background())
 }
 
-func TestAccountStop(t *testing.T) {
+func TestAccountStop(_ *testing.T) {
 	// test dummy account
 	a := account{}
 	a.stop()
