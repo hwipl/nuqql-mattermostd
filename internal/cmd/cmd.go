@@ -1,3 +1,4 @@
+// Package cmd contains the components of nuqql-mattermost.
 package cmd
 
 import (
