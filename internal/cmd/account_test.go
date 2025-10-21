@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"context"
-	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -94,7 +94,7 @@ func TestGetAccounts(t *testing.T) {
 	want := []*account{accounts[0], accounts[1], accounts[2]}
 	got := getAccounts()
 
-	if !reflect.DeepEqual(got, want) {
+	if !slices.Equal(got, want) {
 		t.Errorf("got %v, wanted %v", got, want)
 	}
 }
