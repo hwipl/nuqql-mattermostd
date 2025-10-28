@@ -792,6 +792,24 @@ func (m *mattermost) connect(ctx context.Context) bool {
 	return true
 }
 
+// connectWithCancel wraps the connect method and cancels a connection attempt
+// when mattermost is stopped.
+func (m *mattermost) connectWithCancel(ctx context.Context) bool {
+	result := make(chan bool)
+	ctxCancel, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go func(ctx context.Context) {
+		result <- m.connect(ctx)
+	}(ctxCancel)
+	select {
+	case r := <-result:
+		return r
+	case <-m.done:
+		cancel()
+		return <-result
+	}
+}
+
 // loop runs the main loop of the mattermost client handling websocket events
 func (m *mattermost) loop(ctx context.Context) bool {
 	defer m.websock.Close()
@@ -825,7 +843,7 @@ func (m *mattermost) loop(ctx context.Context) bool {
 func (m *mattermost) run(ctx context.Context) {
 	for {
 		// try to (re)connect to the server
-		for !m.connect(ctx) {
+		for !m.connectWithCancel(ctx) {
 			select {
 			case <-time.After(15 * time.Second):
 				// wait before reconnecting
