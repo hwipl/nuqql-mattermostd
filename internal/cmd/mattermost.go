@@ -126,7 +126,7 @@ func (m *mattermost) getChannelByID(ctx context.Context, id string) *model.Chann
 	if !model.IsValidId(id) {
 		return nil
 	}
-	c, _, err := m.client.GetChannel(ctx, id, "")
+	c, _, err := m.client.GetChannel(ctx, id)
 	if err != nil {
 		return nil
 	}
